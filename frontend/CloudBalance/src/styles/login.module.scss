@@ -1,0 +1,68 @@
+@import '../styles/theme.scss';
+
+.loginContainer {
+  position: fixed;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  padding:  9% 0 0 0; 
+  align-items: center;
+  flex-direction: column;
+  gap: 55px;
+  background: linear-gradient(
+    135deg,
+    var(--bg-gradient-start) 7%,
+    var(--bg-gradient-mid) 90%,
+    var(--bg-gradient-end)
+  );
+}
+
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--form-bg);
+  padding: 2rem;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.3);
+  width: 380px;
+  backdrop-filter: blur(8px);
+
+  h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+  }
+
+  input {
+    width: 100%;
+    padding: 0.6rem;
+    margin: 0.5rem 0;
+    border: none;
+    border-bottom: 2px solid var(--input-border);
+    background: transparent;
+    color: var(--text-color);
+    outline: none;
+  }
+
+  button {
+    width: 60%;
+    padding: 0.6rem;
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 2rem;
+
+    &:hover {
+      background: var(--btn-hover);
+    }
+  }
+
+  p {
+    text-align: center;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--error-color);
+  }
+}

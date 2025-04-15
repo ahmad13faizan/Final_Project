@@ -1,0 +1,9 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    color: var(--text-color);       // Use theme variable for text
+    background: var(--body-bg)
+     no-repeat;                              // Use theme variable for background
+    transition: background 0.3s ease, color 0.3s ease;
+  }

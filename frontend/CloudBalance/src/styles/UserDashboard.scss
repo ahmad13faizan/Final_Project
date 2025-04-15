@@ -1,0 +1,119 @@
+@import "../styles/theme.scss";
+
+.user-dashboard-container {
+  border:#6c757d solid 2px;
+  background:var(--table-bg);
+  border-radius: 12px;
+  padding:17px;
+      .dashboard-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+  
+      h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
+  
+      .actions {
+        display: flex;
+        gap: 1rem;
+  
+        .btn-add-user {
+          background-color: #007bff;
+          color: #fff;
+          padding: 0.5rem 1rem;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+        .btn-reset {
+          background-color: #6c757d;
+          color: #fff;
+          padding: 0.5rem 1rem;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+      }
+    }
+  
+    .filter-row {
+      margin-bottom: 1rem;
+      input[type='text'] {
+        width: 200px;
+        padding: 0.4rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+    }
+  
+    .table-container {
+    font-size: 0.9rem;
+      overflow: auto; // horizontal scroll if table too wide
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        thead {
+          background-color: #f9f9f9;
+        }
+        th, td {
+          text-align: left;
+          padding: 0.75rem;
+          
+          border-bottom: 1px solid #ddd;
+        }
+        th{
+          color: black;
+        }
+
+        tr{
+       
+        }
+        tr:hover {
+          background: #f5f5f5;
+          color:black;
+        }
+  
+        .icon-edit {
+          color: #007bff;
+          margin-right: 0.5rem;
+          cursor: pointer;
+        }
+        .icon-delete {
+          color: #dc3545;
+          cursor: pointer;
+        }
+      }
+    }
+  
+    .pagination-controls {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      margin-top: 1rem;
+  
+      button {
+        padding: 0.4rem 0.8rem;
+        margin: 0 0.5rem;
+        border: 1px solid #ccc;
+        background-color: #fff;
+        cursor: pointer;
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+  
+  .role-label {
+    background: #e7f1ff;
+    color: #007bff;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    margin-right: 0.25rem;
+    display: inline-block;
+  }
+  

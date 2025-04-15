@@ -1,0 +1,30 @@
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    padding: 4px 20px;
+    background-color: transparent;
+    z-index: 10;
+    color: var(--text-color); // 👈 theme-based text color
+    background-color: var(--navbar-bg); // 👈 theme-based navbar background
+  }
+  
+  .footer-left, .footer-right {
+    display: flex;
+    align-items: center;
+  }
+  
+  .footer a {
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .footer a:hover {
+    text-decoration: underline;
+  }
+  

@@ -1,0 +1,57 @@
+// theme.scss
+
+:root {
+    --bg-gradient-start: rgba(241, 241, 241, 0.85);
+    --bg-gradient-mid: rgba(94, 145, 212, 0.651);
+    --bg-gradient-end: rgba(255, 255, 255, 0.664);
+  
+    --form-bg: rgba(255, 255, 255, 0.9);
+    --text-color: #222;
+    --input-border: #ccc;
+    --btn-bg: #10a4d1;
+    --btn-hover: #066986;
+    --btn-text: #fff;
+    --error-color: #d9534f;
+    --table-bg:white;
+
+    --body-bg:#dde2eb;
+  }
+  
+  [data-theme="dark"] {
+
+    --table-bg:#1f2937;
+
+    --body-bg:rgb(2, 13, 43);
+    --bg-gradient-start:rgb(43, 41, 73) 20%;
+    --bg-gradient-mid: rgb(12, 12, 77) 220%;
+    --bg-gradient-end: rgb(30, 38, 39) 100%;
+  
+    --form-bg: rgba(240, 229, 229, 0.151);
+    --text-color: #f1f1f1;
+    --input-border: #b6b0b0;
+    --btn-bg:rgb(31, 113, 160);
+    --btn-hover: rgb(33, 96, 133);
+    --btn-text: #ffffff;
+    --error-color: #ff6b6b;
+  }
+  
+  :root {
+  --text-color: #000;
+  --navbar-bg: #fff;
+  --link-hover: #0066ff;
+  --btn-bg: #007bff;
+  --btn-border: #007bff;
+  --btn-text: #fff;
+  --btn-hover: #0056b3;
+  
+}
+
+[data-theme="dark"] {
+  --text-color: #fff;
+  --navbar-bg: #2c3b80;
+  --link-hover: #cce6ff;
+  --btn-bg: #7bbce2;
+  --btn-border: #fff;
+  --btn-text: #fff;
+  --btn-hover: #3494b1;
+}

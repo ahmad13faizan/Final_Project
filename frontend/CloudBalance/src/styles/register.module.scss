@@ -1,0 +1,75 @@
+.addUserForm {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 16px;
+    gap: 1.5rem;
+    justify-content: space-between;
+    color: black;
+    width: 100%;
+    
+  }
+  .mainFormContainer{
+    box-shadow: 0 0 1vh 0;
+
+    border-radius: 10px;
+    
+    box-sizing: border-box;
+    display: flex;
+    padding:12px;
+    background:white;
+
+  }
+
+  
+  .formField {
+    flex: 1 1 calc(50% - 0.75rem);
+    display: flex;
+    flex-direction: column;
+  }
+  
+  
+  .formField input,
+  .formField select {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  .formField select {
+    max-width:25%;
+  }
+
+  .ButtonStyle {
+    margin-right: auto;
+    padding: 0.3rem;
+    background-color:rgba(24, 24, 128, 0.959);
+    color: white;
+    border: none;
+    height: 44px;;
+    border-radius: 5px;
+    width: 122px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  
+    &:hover {
+      background-color: #4b66be; // light red
+    }
+  }
+  
+ 
+  
+    @media only screen and (min-width: 1568px) {
+      
+      .addUserForm {
+        width:50%;
+      }
+
+      .randContainer{
+        width: 50%; // Or whatever width you prefer
+        margin: 0 auto; // Optional: center the container
+        display:block;
+      }
+    
+    }
+  
