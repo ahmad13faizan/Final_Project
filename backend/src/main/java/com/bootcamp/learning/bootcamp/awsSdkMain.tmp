@@ -1,0 +1,68 @@
+package com.bootcamp.learning.bootcamp;
+
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.S3Object;
+import software.amazon.awssdk.services.sts.StsClient;
+import software.amazon.awssdk.services.sts.auth.StsAssumeRoleCredentialsProvider;
+import software.amazon.awssdk.services.sts.model.AssumeRoleRequest;
+import software.amazon.awssdk.regions.Region;
+import io.github.cdimascio.dotenv.Dotenv;
+
+public class Main {
+
+	public static void main(String[] args) {
+
+		// ✅ Load credentials from .env file
+		Dotenv dotenv = Dotenv.load();
+		String accessKey = dotenv.get("AWS_ACCESS_KEY_ID");
+		String secretKey = dotenv.get("AWS_SECRET_ACCESS_KEY");
+		String region = dotenv.get("AWS_REGION");
+		String roleArn = dotenv.get("AWS_ROLE_ARN"); // cross-account role ARN
+		String bucketName = dotenv.get("AWS_BUCKET"); // shared bucket name
+
+		// ✅ Create your own base credentials
+		AwsBasicCredentials baseCreds = AwsBasicCredentials.create(accessKey, secretKey);
+		StaticCredentialsProvider baseCredsProvider = StaticCredentialsProvider.create(baseCreds);
+
+		// ✅ STS Client to assume role
+		StsClient stsClient = StsClient.builder()
+				.region(Region.of(region))
+				.credentialsProvider(baseCredsProvider)
+				.build();
+
+		// ✅ Prepare AssumeRole request
+		AssumeRoleRequest assumeRoleRequest = AssumeRoleRequest.builder()
+				.roleArn(roleArn)
+				.roleSessionName("myClientSession")
+				.build();
+
+		// ✅ Use assumed role for temporary credentials
+		StsAssumeRoleCredentialsProvider assumedCreds = StsAssumeRoleCredentialsProvider.builder()
+				.stsClient(stsClient)
+				.refreshRequest(assumeRoleRequest)
+				.build();
+
+		// ✅ Use assumed credentials to access S3
+		S3Client s3 = S3Client.builder()
+				.region(Region.of(region))
+				.credentialsProvider(assumedCreds)
+				.build();
+
+		try {
+			System.out.println("🪣 Files in bucket '" + bucketName + "':");
+			s3.listObjectsV2(ListObjectsV2Request.builder().bucket(bucketName).build())
+					.contents()
+					.forEach((S3Object obj) ->
+							System.out.println(" - " + obj.key() + " (" + obj.size() + " bytes)")
+					);
+		} catch (Exception e) {
+			System.err.println("❌ Error accessing S3: " + e.getMessage());
+		}
+
+		s3.close();
+		stsClient.close();
+	}
+}

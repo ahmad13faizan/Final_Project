@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: CloudBalance
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/cloudDatabase
+    username: root
+    password: Curiosity@101
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true

@@ -1,0 +1,54 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.4.3'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.bootcamp.learning'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(23)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+dependencies {
+	// ✅ AWS SDK v2 - Use BOM to align versions
+	implementation platform('software.amazon.awssdk:bom:2.20.144')
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'software.amazon.awssdk:s3'
+	implementation 'software.amazon.awssdk:sts'
+	implementation 'software.amazon.awssdk:ec2'
+	implementation 'software.amazon.awssdk:iam'
+
+	// ✅ .env support
+	implementation 'io.github.cdimascio:dotenv-java:3.0.0'
+
+	// ✅ Spring Boot
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	runtimeOnly 'com.mysql:mysql-connector-j'
+	implementation "org.springframework.boot:spring-boot-starter-security"
+
+
+	//Lombok-related
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	// Add this if you are using tests
+	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
+
+	// ✅ Dev & Test
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
