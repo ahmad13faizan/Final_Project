@@ -25,7 +25,7 @@ public class AccountsController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Accounts> getResourceById(@PathVariable int id) {
+    public ResponseEntity<Accounts> getResourceById(@PathVariable Long id) {
         return service.getResourceById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -35,12 +35,13 @@ public class AccountsController {
     @PostMapping
     public ResponseEntity<Accounts> createResource(@Valid @RequestBody AccountsDTO dto) {
 
-        Accounts resource = new Accounts(
-                dto.getAccountId(),
-                dto.getArn(),
-                dto.getAccountName(),
-                dto.getIsOrphan()
-        );
+        Accounts resource = Accounts.builder()
+                .AccountId(dto.getAccountId())
+                .AccountName(dto.getAccountName())
+                .region(dto.getRegion())
+                .arn(dto.getArn())
+                .isOrphan(true)
+                        .build(  );
 
         return ResponseEntity.ok(service.createResource(resource));
     }
@@ -49,7 +50,7 @@ public class AccountsController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Accounts> updateResource(
-            @PathVariable int id,
+            @PathVariable Long id,
             @RequestBody Accounts resource) {
         if (service.getResourceById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -58,7 +59,7 @@ public class AccountsController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteResource(@PathVariable int id) {
+    public ResponseEntity<Void> deleteResource(@PathVariable Long id) {
         if (service.getResourceById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }

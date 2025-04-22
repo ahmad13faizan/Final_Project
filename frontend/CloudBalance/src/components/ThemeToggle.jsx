@@ -7,6 +7,7 @@ function ThemeToggleButton() {
   const styles={
     toggle:{
       background:'white',
+      color:'black',
       position:'fixed',
       bottom:'75px',
       right:'25px'

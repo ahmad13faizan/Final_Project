@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import api from "../api/axios";
 import "../styles/UserDashboard.scss";
 import { Pencil } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-const UserTable = ({ setActiveComponent }) => {
+const UserTable = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const fetchUsers = async () => {
     try {
@@ -23,9 +25,12 @@ const UserTable = ({ setActiveComponent }) => {
     fetchUsers();
   }, []);
 
-  const handleEdit = (user) => {
+  const handleAddUser = () => {
+    navigate("/admin/register");
+  };
 
-    setActiveComponent("registerUser", user);
+  const handleEdit = (user) => {
+    navigate("/admin/register", { state: { editUser: user } });
   };
 
   return (
@@ -33,7 +38,7 @@ const UserTable = ({ setActiveComponent }) => {
       <div className="dashboard-header">
         <h2>Users</h2>
         <div className="actions">
-          <button onClick={() => setActiveComponent("registerUser")} className="btn-add-user">
+          <button onClick={handleAddUser} className="btn-add-user">
             + Add User
           </button>
         </div>
@@ -52,7 +57,7 @@ const UserTable = ({ setActiveComponent }) => {
                 <th>Email</th>
                 <th>Role</th>
                 <th>Last Login</th>
-                <th>Actions</th> {/* New column for edit action */}
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -64,13 +69,12 @@ const UserTable = ({ setActiveComponent }) => {
                     <td>{user.username || "N/A"}</td>
                     <td>{user.email}</td>
                     <td>{user.role}</td>
-                    <td>
-                      {user.lastLogin
-                        ? new Date(user.lastLogin).toLocaleString()
-                        : "No login yet"}
-                    </td>
-                    <td>
-                      <button onClick={() => handleEdit(user)}>  <Pencil className="bg-blue-800" /></button>
+                    <td>{user.lastLogin ? new Date(user.lastLogin).toLocaleString() : "No login yet"}</td>
+                    <td className="cursor-pointer">
+                      <button onClick={() => handleEdit(user)}>
+                      <Pencil color="#000" size={18} style={{ padding: '4px', borderRadius: '4px' }} />
+
+                      </button>
                     </td>
                   </tr>
                 ))

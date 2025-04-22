@@ -2,6 +2,7 @@ package com.bootcamp.learning.bootcamp.controller;
 
 import com.bootcamp.learning.bootcamp.dto.*;
 import com.bootcamp.learning.bootcamp.entity.User;
+import com.bootcamp.learning.bootcamp.enums.RoleType;
 import com.bootcamp.learning.bootcamp.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,7 +70,7 @@ public class UserControllerTest {
         loginDTO.setEmail("test@example.com");
         loginDTO.setPassword("password");
 
-        LoginResponseDTO response = new LoginResponseDTO("Login successful", "USER", "token123");
+        LoginResponseDTO response = new LoginResponseDTO("Login successful", RoleType.ROLE_READ_ONLY, "token123");
 
         when(userService.login(anyString(), anyString()))
                 .thenReturn(response);
@@ -111,7 +112,7 @@ public class UserControllerTest {
     @Test
     public void testGetAllUsers() throws Exception {
         List<UserDTO> users = List.of(
-                new UserDTO(1L, "test@example.com", "TestUser", "USER", new Date())
+                new UserDTO(1L, "test@example.com", "TestUser", RoleType.ROLE_READ_ONLY, new Date())
         );
 
         when(userService.getAllUsers()).thenReturn(users);

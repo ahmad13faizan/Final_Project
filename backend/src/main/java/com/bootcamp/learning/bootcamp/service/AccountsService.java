@@ -8,8 +8,8 @@ import java.util.Optional;
 public interface AccountsService{
 
     List<Accounts> getAllResources();
-    Optional<Accounts> getResourceById(int id);
+    Optional<Accounts> getResourceById(Long id);
     Accounts createResource(Accounts resource);
-    Accounts updateResource(int id, Accounts resource);
-    void deleteResource(int id);
+    Accounts updateResource(Long id, Accounts resource);
+    void deleteResource(Long id);
 }

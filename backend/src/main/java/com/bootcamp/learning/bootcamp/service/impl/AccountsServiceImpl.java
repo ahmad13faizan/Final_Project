@@ -19,7 +19,7 @@ public class AccountsServiceImpl implements AccountsService {
         return repository.findAll();
     }
 
-    public Optional<Accounts> getResourceById(int id) {
+    public Optional<Accounts> getResourceById(Long id) {
         return repository.findById(id);
     }
 
@@ -27,12 +27,12 @@ public class AccountsServiceImpl implements AccountsService {
         return repository.save(resource);
     }
 
-    public Accounts updateResource(int id, Accounts resource) {
+    public Accounts updateResource(Long id, Accounts resource) {
         resource.setAccountId(id);
         return repository.save(resource);
     }
 
-    public void deleteResource(int id) {
+    public void deleteResource(Long id) {
         repository.deleteById(id);
     }
 }

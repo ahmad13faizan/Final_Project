@@ -1,15 +1,16 @@
-import React from "react";
-import styles from "../styles/sidebar.module.scss";
+import { useNavigate } from 'react-router-dom';
+import styles from '../styles/sidebar.module.scss'; // Adjust the path as necessary
 
-const Sidebar =({ setActiveComponent }) =>{
+const Sidebar = () => {
+  const navigate = useNavigate();
+
+
   return (
     <div className={styles.sidebar}>
-      <h2 className={styles.title}>Control Panel</h2>
-      <ul className={styles.menu}>
-        <li onClick={()=>setActiveComponent("usertable")}>Users</li>
-        <li>Dashboard</li>
-        <li>Module Control Grid</li>
-      </ul>
+      <button onClick={() => navigate('/admin')}>Dashboard</button>
+      <button onClick={() => navigate('/admin/onboarding')}>Onboarding</button>
+      <button onClick={() => navigate('/admin/aws')}>AWS Services</button>
+     
     </div>
   );
 };

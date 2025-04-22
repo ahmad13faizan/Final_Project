@@ -1,19 +1,19 @@
 @import '../styles/theme.scss';
 
 .navbar {
-  display: flex;
-  position: fixed;
+
+   display: flex;
+  position: sticky;
   top: 0;
   left: 0;
-  width: 100%;
   justify-content: space-between;
   align-items: center;
   padding: 0rem 2rem;
-  color: var(--text-color); // 👈 theme-based text color
-  background-color: var(--navbar-bg); // 👈 theme-based navbar background
+  color: var(--nav-text-color); // theme-based text color
+  background-color: var(--navbar-bg); // theme-based navbar background
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
   z-index: 1000;
-  box-sizing:border-box;
+  box-sizing: border-box;
 
   &-logo {
     font-weight: bold;
@@ -26,27 +26,46 @@
     align-items: center;
 
     a {
-      color: var(--link-color); // 👈 theme-based link color
+      color: var(--link-color); // theme-based link color
       text-decoration: none;
       font-weight: 500;
       transition: color 0.3s ease;
 
       &:hover {
-        color: var(--link-hover); // 👈 theme-based hover color
+        color: var(--link-hover); // theme-based hover color
+      }
+    }
+
+    span {
+      margin-right: 18px;
+      font-weight: bold;
+    }
+
+    .cursor-pointer {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+
+      img {
+        margin-right: 8px;
+      }
+
+      div {
+        margin-top: 7px;
       }
     }
 
     button {
-      background: var(--btn-bg); // 👈 theme button bg
-      
-      color: var(--btn-text); // 👈 theme button text
+      background: var(--btn-bg); // theme button bg
+      color: var(--btn-text); // theme button text
       padding: 0.4rem 0.8rem;
+      border: none;
       border-radius: 4px;
       cursor: pointer;
       transition: background 0.3s ease;
 
       &:hover {
-        background: var(--btn-hover); // 👈 theme hover bg
+        background: var(--btn-hover); // theme hover bg
       }
     }
   }

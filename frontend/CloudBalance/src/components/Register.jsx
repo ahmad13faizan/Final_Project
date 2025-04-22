@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import registerFormConfig from "../config/registerFormConfig";
 import styles from "../styles/register.module.scss";
 import api from "../api/axios";
+import { useNavigate } from 'react-router-dom';
+import { useLocation } from "react-router-dom";
 
-
-// Material UI imports
 import {
   Grid,
   Paper,
@@ -17,8 +17,14 @@ import {
   TableRow,
 } from "@mui/material";
 
-const Register = ({ setActiveComponent, editUser }) => {
-  // Initialize formData, and prefill if editUser exists.
+const Register = () => {
+
+  const navigate = useNavigate();
+  const location = useLocation();
+  const editUser = location.state?.editUser || null;
+
+
+  console.log("Edit User:", editUser);
   const [formData, setFormData] = useState({
     email: "",
     username: "",
@@ -26,16 +32,16 @@ const Register = ({ setActiveComponent, editUser }) => {
     password2: "",
     roleId: "",
   });
+
   const [roles, setRoles] = useState([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [hover, setHover] = useState(false);
 
-  // For accounts handling
   const [availableAccounts, setAvailableAccounts] = useState([]);
   const [selectedAccounts, setSelectedAccounts] = useState([]);
 
-  // Fetch roles on mount.
+  // Fetch roles on mount
   useEffect(() => {
     const fetchRoles = async () => {
       try {
@@ -48,23 +54,24 @@ const Register = ({ setActiveComponent, editUser }) => {
     fetchRoles();
   }, []);
 
-  // If editing, prefill the form with the user's data.
+  // If editing, populate form with user data
   useEffect(() => {
     if (editUser) {
       setFormData({
-        email: editUser.email,
-        username: editUser.username,
-        password: "",   // Do not prefill passwords
+        email: editUser.email || "",
+        username: editUser.username || "",
+        password: "",
         password2: "",
         roleId: editUser.role?.id || "",
       });
+
       if (editUser.accounts && editUser.accounts.length > 0) {
         setSelectedAccounts(editUser.accounts);
       }
     }
   }, [editUser]);
 
-  // Fetch accounts if selected role is ROLE_CUSTOMER and remove already selected ones.
+
   useEffect(() => {
     if (roles.length > 0 && formData.roleId) {
       const selectedRole = roles.find(
@@ -91,9 +98,8 @@ const Register = ({ setActiveComponent, editUser }) => {
         setSelectedAccounts([]);
       }
     }
-  }, [formData.roleId, roles, selectedAccounts]);
+  }, [formData.roleId, roles]); // Removed selectedAccounts from dependencies
 
-  // Handlers for moving accounts between lists.
   const handleAvailableSelect = (account) => {
     setAvailableAccounts((prev) =>
       prev.filter((acc) => acc.accountId !== account.accountId)
@@ -116,56 +122,62 @@ const Register = ({ setActiveComponent, editUser }) => {
     }));
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
+    // Password match check
     if (formData.password !== formData.password2) {
       setError("Passwords do not match");
       setSuccess("");
       return;
     }
+  
+    // Construct the payload
+    const payload = {
+      email: formData.email,
+      username: formData.username,
+      password: formData.password,
+      password2: formData.password2,
+      roleId: parseInt(formData.roleId),
+    };
+  
+    // If customer, add accountIds
+    const selectedRole = roles.find(
+      (role) => role.id === parseInt(formData.roleId)
+    );
+    if (selectedRole?.name === "ROLE_CUSTOMER") {
+      payload.accountIds = selectedAccounts.map((acc) => acc.accountId);
+    }
+  
     try {
-      const { email, username, password, password2, roleId } = formData;
-      const accountIds = selectedAccounts.map((acc) => acc.accountId);
-      const payload = {
-        email,
-        username,
-        password,
-        password2,
-        roleId: parseInt(roleId),
-        accountIds,
-      };
-
-      let res;
       if (editUser) {
-        // Update user endpoint (e.g., PUT /api/users/:id)
-        res = await api.put(`/api/users/${editUser.id}`, payload);
+        // EDIT user → PUT to /api/users/{id}
+        await api.put(`/api/users/${editUser.id}`, payload);
+        setSuccess("User updated successfully");
       } else {
-        res = await api.post("/api/register", payload);
+        // REGISTER user → POST to /api/register
+        await api.post("/api/register", payload);
+        setSuccess("Registered successfully");
       }
-
-      setSuccess(
-        res.data?.message ||
-          (editUser ? "User updated successfully" : "Registered successfully")
-      );
+  
       setError("");
-      // Clear form
-      setFormData({
-        email: "",
-        username: "",
-        password: "",
-        password2: "",
-        roleId: "",
-      });
-      setSelectedAccounts([]);
-      setAvailableAccounts([]);
+      // Optional: navigate after success
+      setTimeout(() => navigate("/admin"), 1000);
     } catch (err) {
-      setError(
-        err.response?.data ||
-          (editUser ? "User update failed" : "Registration failed")
-      );
+      // Display server-side validation or message
+      if (err.response && err.response.data) {
+        const serverError = err.response.data.message || JSON.stringify(err.response.data);
+        setError("Server error: " + serverError);
+      } else {
+        setError("An unexpected error occurred.");
+      }
       setSuccess("");
     }
   };
+  
+  
+  
 
   const cancelButtonStyle = {
     marginRight: "auto",
@@ -173,11 +185,16 @@ const Register = ({ setActiveComponent, editUser }) => {
     backgroundColor: hover ? "#8B0000" : "red",
     color: "white",
     border: "none",
+    height: "30px",
     borderRadius: "5px",
     width: "62px",
     fontSize: "0.8rem",
     cursor: "pointer",
     transition: "background-color 0.3s ease",
+  };
+
+  const handleCancel = () => {
+    navigate("/admin"); 
   };
 
   return (
@@ -188,14 +205,15 @@ const Register = ({ setActiveComponent, editUser }) => {
           style={cancelButtonStyle}
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
-          onClick={() => setActiveComponent("usertable")}
+          onClick={handleCancel}
         >
           Cancel
         </button>
 
-        <h2 style={{ flexBasis: "100%" }}>
-          {editUser ? "Edit User" : "Add User"}
-        </h2>
+        
+        <h2>{editUser ? "Edit User" : "Add User"}</h2>
+          <div className={styles.spacerDiv}></div> {/* Empty div to take up space */}
+
 
         {registerFormConfig.map((field) => (
           <div key={field.name} className={styles.formField}>
@@ -226,12 +244,12 @@ const Register = ({ setActiveComponent, editUser }) => {
           </div>
         ))}
 
-        {/* Account Selection Panels: They appear below the form fields */}
+        {/* Account Selection Panels */}
         {(availableAccounts.length > 0 || selectedAccounts.length > 0) && (
           <div style={{ marginTop: "2rem" }}>
             <h3>Manage Account Associations</h3>
             <Grid container spacing={2}>
-              {/* Available Accounts Panel */}
+              {/* Available Accounts */}
               <Grid item xs={6}>
                 <h4>Available Accounts</h4>
                 <TableContainer component={Paper}>
@@ -260,9 +278,10 @@ const Register = ({ setActiveComponent, editUser }) => {
                   </Table>
                 </TableContainer>
               </Grid>
-              {/* Selected Accounts Panel */}
+
+              {/* Selected Accounts */}
               <Grid item xs={6}>
-                <h4>Associated Accounts</h4>
+                <h4>Selected Accounts</h4>
                 <TableContainer component={Paper}>
                   <Table size="small">
                     <TableHead>
@@ -293,23 +312,23 @@ const Register = ({ setActiveComponent, editUser }) => {
           </div>
         )}
 
-        <br />
-
-        {error && typeof error === "object" ? (
-          <div style={{ color: "red" }}>
-            {Object.values(error).map((msg, idx) => (
-              <p key={idx}>{msg}</p>
-            ))}
-          </div>
-        ) : (
-          <p style={{ color: "red" }}>{error}</p>
-        )}
-
-        {success && <p style={{ color: "green" }}>{success}</p>}
-
-        <button type="submit" className={styles.ButtonStyle}>
-          {editUser ? "Update User" : "Add User"}
-        </button>
+        <div className={styles.formField}>
+          <button
+            type="submit"
+            style={{
+              padding: "0.5rem 1rem",
+              backgroundColor: "#007bff",
+              color: "white",
+              border: "none",
+              width: "90px",
+              borderRadius: "5px",
+            }}
+          >
+            {editUser ? "Update User" : "Register"}
+          </button>
+          {error && <div style={{ color: "red" }}>{error}</div>}
+          {success && <div style={{ color: "green" }}>{success}</div>}
+        </div>
       </form>
     </div>
   );

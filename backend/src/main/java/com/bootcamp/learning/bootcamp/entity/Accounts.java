@@ -4,9 +4,13 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Entity
@@ -15,7 +19,7 @@ public class Accounts {
 
     @Id
     @Column(nullable = false)
-    private int AccountId;
+    private Long AccountId;
 
     @Column(nullable = false)
     private String arn;
@@ -23,24 +27,10 @@ public class Accounts {
     @Column(nullable = false)
     private String AccountName;
 
-    private Boolean is_orphan;
+    @Builder.Default
+    private Boolean isOrphan=true;
 
-    // ✅ No users field here
+    @Column(nullable = false)
+    private String region;
 
-    public Accounts(int accountId, String arn, String accountName, Boolean isOrphan) {
-        this.AccountId = accountId;
-        this.arn = arn;
-        this.AccountName = accountName;
-        this.is_orphan = isOrphan;
-    }
-
-    @Override
-    public String toString() {
-        return "Accounts{" +
-                "AccountId=" + AccountId +
-                ", arn='" + arn + '\'' +
-                ", AccountName='" + AccountName + '\'' +
-                ", is_orphan=" + is_orphan +
-                '}';
-    }
 }

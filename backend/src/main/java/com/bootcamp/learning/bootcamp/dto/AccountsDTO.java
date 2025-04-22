@@ -11,7 +11,7 @@ import lombok.Setter;
 public class AccountsDTO {
 
     @NotNull(message = "AccountId is required")
-    private Integer accountId;
+    private Long accountId;
 
     @NotBlank(message = "ARN cannot be blank")
     @Pattern(regexp = "^arn:aws:[\\w-]+:[\\w-]*:\\d{12}:.+$",
@@ -21,5 +21,7 @@ public class AccountsDTO {
     @NotBlank(message = "Account Name cannot be blank")
     private String accountName;
 
-    private Boolean isOrphan = true;
+    @NotBlank(message = "Region cannot be blank")
+    private String region;
+
 }

@@ -1,63 +1,88 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "../styles/Navbar.module.scss";
 import ThemeToggleButton from "./ThemeToggle";
-import api from "../api/axios"; // 👈 Make sure path is correct
-import { useState } from "react";
+import api from "../api/axios";
+import { FaUser, FaSignOutAlt } from "react-icons/fa"; // Import icons
 import logo from "../assets/images/CloudBalance_logo2.png";
-import logoutBtn from "../assets/images/logout-icon.png";
 
 const Navbar = () => {
   const role = localStorage.getItem("role");
+  const email = localStorage.getItem("email");
   const navigate = useNavigate();
 
   const [hover, setHover] = useState(false);
 
   const buttonStyle = {
-    backgroundColor: hover ? "red" : "",
-    color: hover ? "white" : "blue",
-    padding: "0px 12px 0px 0px",
-    borderRadius: "7px",
+  
+    padding: "8px 16px",
+    borderRadius: "6px",
+    border: "black solid 1px",
     display: "flex",
     cursor: "pointer",
-    border: "solid 1px ",
+    alignItems: "center",
+    transition: "all 0.3s ease",
+  
+    // Add hover styles
+    boxShadow: hover
+      ? "0 0px 8px rgba(0, 0, 0, 0.2), inset 0 0 20px rgba(0, 0, 0, 0.1)"
+      : "none",
+    filter: hover ? "brightness(0.98) contrast(1.05)" : "none",
   };
-
+  
   const handleLogout = async () => {
+    const confirmed = window.confirm("Are you sure you want to log out?");
+    if (!confirmed) return;
+  
     try {
-      await api.post("/api/logout"); // 👈 Uses token from interceptor
-
+      await api.post("/api/logout");
       localStorage.removeItem("token");
       localStorage.removeItem("role");
-
       navigate("/login");
     } catch (error) {
       console.error("Logout failed:", error);
       alert("Logout failed. Please try again.");
     }
   };
+  
 
   return (
     <nav className={styles.navbar}>
       <div className={styles["navbar-logo"]}>
-        <img src={logo} alt="" />
+        <img src={logo} alt="Logo" />
       </div>
 
       <ThemeToggleButton />
       <div className={styles["navbar-links"]}>
-        {role === "ROLE_ADMIN" && <Link to="/admin">Admin</Link>}
-        {role === "ROLE_CUSTOMER" && <Link to="/customer">Customer</Link>}
-        {role === "ROLE_READ_ONLY" && <Link to="/readonly">Read-Only</Link>}
+        {/* Profile Icon */}
+        <FaUser
+          size={24}
+          style={{
+            borderRadius: "50%",
+            border: "2px solid var(--text-color)",
+            marginRight: "12px",
+            padding: "4px",
+            color: "var(--text-color)",
+          }}
+        />
 
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          {role === "ROLE_ADMIN" && <Link to="/admin"><b>Admin</b></Link>}
+          {role === "ROLE_CUSTOMER" && <Link to="/customer"><b>Customer</b></Link>}
+          {role === "ROLE_READ_ONLY" && <Link to="/readonly"><b>Read-Only</b></Link>}
+
+          <span style={{ marginRight: "18px", fontWeight: "500" }}>{email}</span>
+        </div>
+
+        {/* Logout Button with FaSignOutAlt Icon */}
         <div
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
           onClick={handleLogout}
           style={buttonStyle}
         >
-          <img src={logoutBtn} />
-
-          <div style={{ marginTop: "4px" }}> Logout</div>
+          <FaSignOutAlt size={12} style={{ marginRight: "8px" }} /> {/* Logout icon */}
+          <div style={{  fontSize: "16px" }}>Logout</div>
         </div>
       </div>
     </nav>

@@ -123,7 +123,14 @@ public class UserServiceImpl implements UserService {
         // ✅ Link Accounts to User
         if (request.getAccountIds() != null && !request.getAccountIds().isEmpty()) {
             List<Accounts> accounts = accountsRepository.findAllById(request.getAccountIds());
+
+            // 🔁 Set isOrphan to false for each linked account
+            for (Accounts account : accounts) {
+                account.setIsOrphan(false);
+            }
+
             newUser.setAccounts(accounts);
+            accountsRepository.saveAll(accounts); // 💾 Persist orphan status update
         }
 
         userRepository.save(newUser);
@@ -163,8 +170,16 @@ public class UserServiceImpl implements UserService {
         // Link Accounts to User (for many-to-many relationship)
         if (request.getAccountIds() != null && !request.getAccountIds().isEmpty()) {
             List<Accounts> accounts = accountsRepository.findAllById(request.getAccountIds());
+
+            // 🔁 Set isOrphan to false for each linked account
+            for (Accounts account : accounts) {
+                account.setIsOrphan(false);
+            }
+
             userToUpdate.setAccounts(accounts);
+            accountsRepository.saveAll(accounts); // 💾 Persist orphan status update
         }
+
 
         // Save the updated user entity
         userRepository.save(userToUpdate);

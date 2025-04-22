@@ -1,0 +1,117 @@
+
+
+.addPoliciesContainer {
+    width: 90%;
+    margin-bottom: 4rem;
+    padding: 2rem;
+    font-family: Arial, sans-serif;
+  }
+  
+  .section {
+    margin-bottom: 8rem;
+    background-color: #fff;
+    color: #555;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .bullet{
+    background-color: #889abe;
+    border-radius: 50%
+    ;    
+    color: #fff;
+    counter-increment: section;
+    display: inline-block;
+    font-size: 18px;
+    font-weight: 400;
+    height: 24px;
+    margin-right: 15px;
+ 
+    text-align: center;
+    width: 24px;
+    }
+  
+  .heading {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+  
+  .stepText {
+
+    margin: 2rem 0rem;
+    font-size: 0.95rem;
+  }
+  
+  .link {
+
+    color: #0a3ca2;
+    text-decoration: underline;
+  
+}
+  
+  .codeBlock {
+    position: relative-;
+    margin: 1.9rem 0;
+    color:#0a3ca2 !important;
+    font-weight: 500;
+    height: 200px;
+    overflow: auto;
+    background-color: #f1f1f1;
+    padding: 1rem;
+    font-family: Roboto,sans-serif !important;
+    font-size: 12px;
+    border-radius: 4px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    margin-bottom: 1rem;
+  }
+  
+  .inputBox {
+    color: #000 important;
+    font-family: Roboto,sans-serif !important;
+    font-weight:500;
+    margin: 22px 0px ;
+    background: #eef3f7;
+    border: 1px solid #ccc;
+    padding: 0.5rem 0.75rem;
+    font-size: 14px;
+    border-radius: 4px;
+    width: fit-content;
+    margin-bottom: 1rem;
+  }
+  
+  .policyNameLabel {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    display: block;
+  }
+  
+  .roleCard {
+    background-color: #fff;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.9rem;
+  }
+  
+  .roleCard .summaryRow {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+  
+  .roleCard .summaryLabel {
+    font-weight: 600;
+    color: #444;
+  }
+  
+  .pageIndicator {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: #555;
+  }
+  

@@ -30,7 +30,9 @@ public class RegisterRequest {
     @Size(min = 3, max = 20, message = "Username must be between 3 and 20 characters")
     private String username;
 
-    private List<Integer> accountIds;
+    private List<Long> accountIds;
+
+
 
     @Override
     public String toString() {

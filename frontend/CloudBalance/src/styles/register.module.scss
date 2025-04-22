@@ -1,6 +1,7 @@
 .addUserForm {
     display: flex;
     flex-wrap: wrap;
+    position: relative;
     padding: 16px;
     gap: 1.5rem;
     justify-content: space-between;
@@ -9,7 +10,14 @@
     
   }
   .mainFormContainer{
-    box-shadow: 0 0 1vh 0;
+    position: relative;
+    margin: 22px ;
+    .form-header-box h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+}
 
     border-radius: 10px;
     
@@ -56,6 +64,12 @@
       background-color: #4b66be; // light red
     }
   }
+
+
+
+.spacerDiv {
+  width: 35%; /* Full width */
+}
   
  
   

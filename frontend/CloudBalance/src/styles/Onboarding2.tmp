@@ -1,0 +1,85 @@
+.addPoliciesContainer {
+    width: 100%;
+    padding: 2rem;
+    background-color: #f5f8fa;
+    font-family: Arial, sans-serif;
+  }
+  
+  .section {
+    margin-bottom: 2rem;
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .heading {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+  
+  .stepText {
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+  }
+  
+  .link {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .codeBlock {
+    background-color: #f1f1f1;
+    padding: 1rem;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    margin-bottom: 1rem;
+  }
+  
+  .inputBox {
+    background: #eef3f7;
+    border: 1px solid #ccc;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.95rem;
+    border-radius: 4px;
+    width: fit-content;
+    margin-bottom: 1rem;
+  }
+  
+  .policyNameLabel {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    display: block;
+  }
+  
+  .roleCard {
+    background-color: #fff;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.9rem;
+  }
+  
+  .roleCard .summaryRow {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+  
+  .roleCard .summaryLabel {
+    font-weight: 600;
+    color: #444;
+  }
+  
+  .pageIndicator {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: #555;
+  }
+  

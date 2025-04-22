@@ -7,11 +7,17 @@ import logo from "../assets/images/CloudBalance_logo.png";
 import ThemeToggleButton from "../components/ThemeToggle";
 
 const Login = () => {
+
   const [email, setemail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
 
+
+
+
   const navigate = useNavigate();
+
+  
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -28,6 +34,7 @@ const Login = () => {
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role);
       setMessage("Login Success: " + data.role);
+      localStorage.setItem("email", email);
 
       if (data.role === "ROLE_ADMIN") {
         navigate("/admin");

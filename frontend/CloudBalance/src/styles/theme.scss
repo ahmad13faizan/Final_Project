@@ -1,6 +1,7 @@
 // theme.scss
 
 :root {
+  overflow:hidden;
     --bg-gradient-start: rgba(241, 241, 241, 0.85);
     --bg-gradient-mid: rgba(94, 145, 212, 0.651);
     --bg-gradient-end: rgba(255, 255, 255, 0.664);
@@ -13,12 +14,18 @@
     --btn-text: #fff;
     --error-color: #d9534f;
     --table-bg:white;
+    --sidebar-bg:white;
+    --sidebar-text:#000;
+    --nav-text-color:rgb(62, 147, 243);
+
 
     --body-bg:#dde2eb;
   }
   
   [data-theme="dark"] {
-
+    --nav-text-color: #fff;
+    --sidebar-bg:#1e1e2f;
+    --sidebar-text:#fff;
     --table-bg:#1f2937;
 
     --body-bg:rgb(2, 13, 43);
