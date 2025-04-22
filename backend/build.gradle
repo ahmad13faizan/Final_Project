@@ -24,6 +24,9 @@ dependencies {
 	implementation 'software.amazon.awssdk:sts'
 	implementation 'software.amazon.awssdk:ec2'
 	implementation 'software.amazon.awssdk:iam'
+	implementation 'software.amazon.awssdk:rds'
+	implementation 'software.amazon.awssdk:autoscaling'
+
 
 	// ✅ .env support
 	implementation 'io.github.cdimascio:dotenv-java:3.0.0'

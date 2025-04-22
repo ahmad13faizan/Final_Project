@@ -6,6 +6,7 @@ import com.bootcamp.learning.bootcamp.service.AccountsService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -20,9 +21,10 @@ public class AccountsController {
     private AccountsService service;
 
     @GetMapping
-    public List<Accounts> getAllResources() {
-        return service.getAllResources();
+    public ResponseEntity<List<Accounts>> getAccounts(Authentication authentication) {
+        return ResponseEntity.ok(service.getAccounts(authentication));
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Accounts> getResourceById(@PathVariable Long id) {
@@ -36,8 +38,8 @@ public class AccountsController {
     public ResponseEntity<Accounts> createResource(@Valid @RequestBody AccountsDTO dto) {
 
         Accounts resource = Accounts.builder()
-                .AccountId(dto.getAccountId())
-                .AccountName(dto.getAccountName())
+                .accountId(dto.getAccountId())
+                .accountName(dto.getAccountName())
                 .region(dto.getRegion())
                 .arn(dto.getArn())
                 .isOrphan(true)

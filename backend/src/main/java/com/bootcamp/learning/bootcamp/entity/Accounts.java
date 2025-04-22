@@ -19,18 +19,22 @@ public class Accounts {
 
     @Id
     @Column(nullable = false)
-    private Long AccountId;
+    private Long accountId;
 
     @Column(nullable = false)
     private String arn;
 
     @Column(nullable = false)
-    private String AccountName;
+    private String accountName;
 
     @Builder.Default
     private Boolean isOrphan=true;
 
     @Column(nullable = false)
     private String region;
+
+    // ✅ No users field here
+
+
 
 }

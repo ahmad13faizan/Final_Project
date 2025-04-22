@@ -1,6 +1,8 @@
 package com.bootcamp.learning.bootcamp.controller;
 
+import com.bootcamp.learning.bootcamp.dto.AsgDto;
 import com.bootcamp.learning.bootcamp.dto.Ec2InstanceDto;
+import com.bootcamp.learning.bootcamp.dto.RdsInstanceDto;
 import com.bootcamp.learning.bootcamp.service.AWSServices;
 import com.bootcamp.learning.bootcamp.service.AccountsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +26,23 @@ public class AWSAccountsController {
 
     @GetMapping("/{id}/ec2")
     public ResponseEntity<List<Ec2InstanceDto>> getEc2Instances(@PathVariable Long id) {
-        return service.getResourceById(id)
-                .map(account -> {
-                    List<Ec2InstanceDto> instances = awsServices.fetchInstances(account);
-                    return ResponseEntity.ok(instances);
-                })
-                .orElse(ResponseEntity.notFound().build());
+        List<Ec2InstanceDto> instances = awsServices.fetchInstances(id);
+        return ResponseEntity.ok(instances);
     }
+
+    @GetMapping("/{id}/rds")
+    public ResponseEntity<List<RdsInstanceDto>> getRdsInstances(@PathVariable Long id) {
+        List<RdsInstanceDto> instances = awsServices.fetchRdsInstances(id);
+        return ResponseEntity.ok(instances);
+    }
+
+    @GetMapping("/{id}/asg")
+    public ResponseEntity<List<AsgDto>> getAsgGroups(@PathVariable Long id) {
+        List<AsgDto> groups = awsServices.fetchAutoScalingGroups(id);
+        return ResponseEntity.ok(groups);
+    }
+
+
+
 
 }

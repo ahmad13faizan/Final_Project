@@ -76,11 +76,16 @@ public class TokenAuthFilter extends OncePerRequestFilter {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // 🔓 Allow logout for any authenticated user
-        if ("/api/logout".equals(path)) {
+        if (
+                path.equals("/api/logout") ||
+                        path.equals("/api/accounts") ||
+                        path.startsWith("/api/AWSAccount")
+        ) {
             filterChain.doFilter(request, response);
             return;
         }
+
+
 
         // 🔒 For all other endpoints, only allow ADMIN
         if (!RoleType.ROLE_ADMIN.equals(roleType)) {
