@@ -6,8 +6,8 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 public class RdsInstanceDto {
-    private String identifier;
-    private String instanceClass;
+    private String id;
+    private String name;
+    private String region;
     private String status;
-    private String endpoint;
 }

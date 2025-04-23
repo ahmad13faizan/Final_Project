@@ -260,7 +260,7 @@ const Onboarding = () => {
           {formConfig.length > 2 && (
             <Box mt={2} display="flex" gap={2}>
               <Divider sx={{ my: 3 }} />
-              <Box mt={2} width={"48%"}>
+              <Box mt={2} width={"50%"}>
                 <Typography variant="body1" gutterBottom>
                   <strong>{formConfig[2].label}</strong>
                 </Typography>
@@ -276,7 +276,7 @@ const Onboarding = () => {
                 />
               </Box>
               {formConfig.length > 3 && (
-                <Box mt={2} width={"48%"}>
+                <Box mt={2} width={"50%"}>
                   <Typography variant="body1" gutterBottom>
                     <strong>{formConfig[3].label}</strong>
                   </Typography>

@@ -17,6 +17,8 @@ import Onboarding3 from "../components/admin_components/Onboarding3";
 import ThankYouPage from "./admin_components/ThankYouPage";
 import "../styles/common.scss";
 import AWSDashboard from "../components/admin_components/AWSDashboard";
+import Cost_Explorer from "./admin_components/Cost_Explorer";
+
 
 const AppRoutes = () => {
   const location = useLocation();
@@ -44,6 +46,7 @@ const AppRoutes = () => {
             <Route path="onboarding3" element={<Onboarding3 />} />
             <Route path="thank-you" element={<ThankYouPage />} />
             <Route path="aws" element={<AWSDashboard />} />
+            <Route path="cost" element={<Cost_Explorer/>}  />
           </Route>
         </Route>
 

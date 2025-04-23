@@ -1,35 +1,42 @@
 @import '../styles/theme.scss';
 
 .sidebar {
-  color: var(--sidebar-text);
-  width: 100px;
   display: flex;
   flex-direction: column;
   padding: 1rem;
   background-color: var(--sidebar-bg);
-  width: 220px;
   height: 100vh;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-  position: "sticky";
+  gap: 1rem;
+  width: 220px;
+  color: var(--sidebar-text);
+  
 }
 
-button {
-  background-color: transparent;
+.sidebarBtn {
+  border-radius: 6px;
   color: var(--sidebar-text);
+  padding:6px 2px;
+  display: flex;
+  align-items: center;
+  background: none;
   border: none;
-  padding: 0.75rem 1rem;
-  text-align: left;
-  cursor: pointer;
   font-size: 1rem;
-  border-radius: 8px;
-  transition: background 0.3s;
+
+  transition: background 0.2s;
 
   &:hover {
-    background-color: #888891;
-    color:whitesmoke
+    background-color: #7575a0;
+    color: white;
   }
 
-  &:not(:last-child) {
-    margin-bottom: 0.5rem;
+  .icon {
+    margin-right: 0.75rem;
+    font-size: 1.2rem;
+    color: #90caf9;
+  }
+
+  .label {
+    font-weight: 500;
   }
 }
+

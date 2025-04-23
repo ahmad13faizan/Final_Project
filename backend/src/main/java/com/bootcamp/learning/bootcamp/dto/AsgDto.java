@@ -6,8 +6,8 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 public class AsgDto {
-    private String groupName;
-    private int desiredCapacity;
-    private int minSize;
-    private int maxSize;
+    private String id;
+    private String name;
+    private String region;
+    private String status;
 }

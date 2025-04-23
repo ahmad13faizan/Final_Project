@@ -1,5 +1,6 @@
 package com.bootcamp.learning.bootcamp.service.impl;
 
+import com.bootcamp.learning.bootcamp.dto.AccountSummaryDTO;
 import com.bootcamp.learning.bootcamp.entity.Accounts;
 import com.bootcamp.learning.bootcamp.entity.User;
 import com.bootcamp.learning.bootcamp.enums.RoleType;
@@ -40,17 +41,23 @@ public class AccountsServiceImpl implements AccountsService {
         repository.deleteById(id);
     }
 
-    public List<Accounts> getAccounts(Authentication authentication) {
+    public List<AccountSummaryDTO> getAccounts(Authentication authentication) {
         User user = userService.findByEmail(authentication.getName());
         RoleType roleName = user.getRole().getName();
-        if (roleName == RoleType.ROLE_ADMIN || roleName == RoleType.ROLE_READ_ONLY) {
-            return repository.findAll();
-        } else if (roleName == RoleType.ROLE_CUSTOMER) {
-            System.out.println("Accounts: " + user.getAccounts());
 
-            return user.getAccounts(); // ManyToMany
+        List<Accounts> accounts;
+        if (roleName == RoleType.ROLE_ADMIN || roleName == RoleType.ROLE_READ_ONLY) {
+            accounts = repository.findAll();
+        } else if (roleName == RoleType.ROLE_CUSTOMER) {
+            accounts = user.getAccounts(); // ManyToMany
         } else {
             throw new AccessDeniedException("Unauthorized role");
         }
+
+        // Convert to DTO
+        return accounts.stream()
+                .map(acc -> new AccountSummaryDTO(acc.getAccountId(), acc.getAccountName()))
+                .toList();
     }
+
 }

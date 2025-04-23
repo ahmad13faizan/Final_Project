@@ -4,7 +4,7 @@ const LogoutButton = ({ handleLogout }) => {
   const [hover, setHover] = useState(false);
 
   const buttonStyle = {
-    backgroundColor: hover ? '#ff4d4d' : 'red', // light red on hover, red normally
+    backgroundColor: hover ? '#ff4d4d' : 'blue', // light red on hover, red normally
     color: 'white',
     border: 'none',
     padding: '0.5rem 1rem',

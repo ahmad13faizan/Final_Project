@@ -12,12 +12,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
 
-
-
-
   const navigate = useNavigate();
-
-  
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -58,6 +53,7 @@ const Login = () => {
   return (
     <div className={styles.loginContainer}>
       <ThemeToggleButton style={styles.toggle} />
+      
       <img src={logo} alt="logo" />
       <form className={styles.loginForm} onSubmit={handleLogin}>
         <h2>Login</h2>
