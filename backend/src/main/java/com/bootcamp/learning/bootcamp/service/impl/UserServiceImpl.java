@@ -23,34 +23,24 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.*;
 import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
-
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private final AuthenticationManager authenticationManager;
 
-    public UserServiceImpl(AuthenticationManager authenticationManager) {
-        this.authenticationManager = authenticationManager;
-    }
-
-
-// inside UserServiceImpl
-
     @Autowired
     private LoginTokenRepository tokenRepository;
 
     @Autowired
-    AccountsRepository accountsRepository;
+    private AccountsRepository accountsRepository;
 
     @Autowired
-    RoleRepository roleRepository;
+    private RoleRepository roleRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -58,6 +48,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    public UserServiceImpl(AuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
+    }
 
     @Override
     public User findByEmail(String email) {
@@ -65,10 +58,13 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
     }
 
-
     @Override
     public List<Map<String, Object>> getAllRoleNames() {
         List<Role> roles = roleRepository.findAll();
+        if (roles.isEmpty()) {
+            throw new RuntimeException("No roles found in the system.");
+        }
+
         return roles.stream()
                 .map(role -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -79,10 +75,9 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
-
     @Override
     public List<UserDTO> getAllUsers() {
-        return userRepository.findAll().stream()
+        List<UserDTO> users = userRepository.findAll().stream()
                 .map(user -> new UserDTO(
                         user.getId(),
                         user.getEmail(),
@@ -90,34 +85,42 @@ public class UserServiceImpl implements UserService {
                         user.getRole().getName(),
                         user.getLastLogin()
                 ))
-                .toList();
+                .collect(Collectors.toList());
+
+        if (users.isEmpty()) {
+            throw new RuntimeException("No users found.");
+        }
+
+        return users;
     }
 
     @Transactional
+    @Override
     public String logout(String token) {
         Optional<LoginToken> loginTokenOpt = tokenRepository.findByToken(token);
-        if (loginTokenOpt.isPresent()) {
-            User user = loginTokenOpt.get().getUser();
-            tokenRepository.deleteByUser(user);
-            return "Logout successful.";
-        } else {
-            return "Invalid token or already logged out.";
+        if (!loginTokenOpt.isPresent()) {
+            throw new RuntimeException("Invalid or expired token.");
         }
+
+        User user = loginTokenOpt.get().getUser();
+        tokenRepository.deleteByUser(user);
+        return "Logout successful.";
     }
 
-    public ResponseEntity<String> registerUser(@RequestBody RegisterRequest request) {
+    @Override
+    public ResponseEntity<String> registerUser(RegisterRequest request) {
         Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
 
         if (existingUser.isPresent()) {
-            return ResponseEntity.badRequest().body("❌ Email already exists");
+            throw new RuntimeException("Email already exists.");
         }
 
         if (!request.getPassword().equals(request.getPassword2())) {
-            return ResponseEntity.badRequest().body("❌ Passwords do not match");
+            throw new RuntimeException("Passwords do not match.");
         }
 
         Role role = roleRepository.findById(request.getRoleId())
-                .orElseThrow(() -> new RuntimeException("❌ Role not found: " + request.getRoleId()));
+                .orElseThrow(() -> new RuntimeException("Role not found with ID: " + request.getRoleId()));
 
         User newUser = new User();
         newUser.setEmail(request.getEmail());
@@ -125,79 +128,59 @@ public class UserServiceImpl implements UserService {
         newUser.setRole(role);
         newUser.setUsername(request.getUsername());
 
-        // ✅ Link Accounts to User
         if (request.getAccountIds() != null && !request.getAccountIds().isEmpty()) {
             List<Accounts> accounts = accountsRepository.findAllById(request.getAccountIds());
-
-            // 🔁 Set isOrphan to false for each linked account
             for (Accounts account : accounts) {
                 account.setIsOrphan(false);
             }
-
             newUser.setAccounts(accounts);
-            accountsRepository.saveAll(accounts); // 💾 Persist orphan status update
+            accountsRepository.saveAll(accounts);
         }
 
         userRepository.save(newUser);
-        return ResponseEntity.ok("✅ User registered successfully");
+        return ResponseEntity.ok("User registered successfully.");
     }
 
-
-
-    public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody RegisterRequest request) {
-        // Fetch the user by ID
+    @Override
+    public ResponseEntity<String> updateUser(Long id, RegisterRequest request) {
         User userToUpdate = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("❌ User not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
 
-        // Optionally check for email duplication if updating email (if applicable)
         Optional<User> existingUserByEmail = userRepository.findByEmail(request.getEmail());
         if (existingUserByEmail.isPresent() && !existingUserByEmail.get().getId().equals(id)) {
-            return ResponseEntity.badRequest().body("❌ Email already exists");
+            throw new RuntimeException("Email already exists.");
         }
 
-        // Check if passwords are provided and match before updating them
         if (request.getPassword() != null && !request.getPassword().isEmpty()) {
             if (!request.getPassword().equals(request.getPassword2())) {
-                return ResponseEntity.badRequest().body("❌ Passwords do not match");
+                throw new RuntimeException("Passwords do not match.");
             }
             userToUpdate.setPassword(passwordEncoder.encode(request.getPassword()));
         }
 
-        // Update other fields
         userToUpdate.setEmail(request.getEmail());
         userToUpdate.setUsername(request.getUsername());
 
-        // Retrieve role by id and update
         Role role = roleRepository.findById(request.getRoleId())
-                .orElseThrow(() -> new RuntimeException("❌ Role not found: " + request.getRoleId()));
+                .orElseThrow(() -> new RuntimeException("Role not found with ID: " + request.getRoleId()));
         userToUpdate.setRole(role);
 
-        // Link Accounts to User (for many-to-many relationship)
         if (request.getAccountIds() != null && !request.getAccountIds().isEmpty()) {
             List<Accounts> accounts = accountsRepository.findAllById(request.getAccountIds());
-
-            // 🔁 Set isOrphan to false for each linked account
             for (Accounts account : accounts) {
                 account.setIsOrphan(false);
             }
-
             userToUpdate.setAccounts(accounts);
-            accountsRepository.saveAll(accounts); // 💾 Persist orphan status update
+            accountsRepository.saveAll(accounts);
         }
 
-
-        // Save the updated user entity
         userRepository.save(userToUpdate);
-
-        return ResponseEntity.ok("✅ User updated successfully");
+        return ResponseEntity.ok("User updated successfully.");
     }
-
-
 
     @Override
     public LoginResponseDTO login(String username, String password) {
         try {
-            // 🔐 Authenticate user
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)
             );
@@ -206,11 +189,9 @@ public class UserServiceImpl implements UserService {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             User user = userDetails.getUser();
 
-            // ✅ Update last login time
             user.setLastLogin(new Date());
-            userRepository.save(user); // Don't forget to persist it!
+            userRepository.save(user);
 
-            // 🔑 Generate or reuse token
             Optional<LoginToken> existing = tokenRepository.findByUser(user);
             String randomToken = UUID.randomUUID().toString();
 
@@ -219,17 +200,11 @@ public class UserServiceImpl implements UserService {
             loginToken.setCreatedAt(LocalDateTime.now());
             loginToken.setUser(user);
 
-            // 💾 Save token to DB
             tokenRepository.save(loginToken);
 
             return new LoginResponseDTO("Login successful", user.getRole().getName(), randomToken);
-
         } catch (BadCredentialsException e) {
-            throw new RuntimeException("Invalid username or password");
+            throw new RuntimeException("Invalid username or password.");
         }
     }
-
-
-
-
 }

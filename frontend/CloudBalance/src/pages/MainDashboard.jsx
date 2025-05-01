@@ -7,8 +7,10 @@ const MainDashboard = () => {
   return (
     <div style={{ display: "flex" }}>
       <Sidebar />
+      
       <div style={{ flex: 1, overflow: "auto", height: "calc(100vh - 20px)" }}>
         <Outlet />
+ 
       </div>
     </div>
   );

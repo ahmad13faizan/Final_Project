@@ -14,7 +14,6 @@ import software.amazon.awssdk.services.autoscaling.AutoScalingClient;
 import software.amazon.awssdk.services.ec2.Ec2Client;
 import software.amazon.awssdk.services.rds.RdsClient;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,6 +25,7 @@ public class AWSServicesImpl implements AWSServices {
     @Override
     public List<Ec2InstanceDto> fetchInstances(Long id) {
         try {
+
             Accounts account = awsHelper.getAccountOrThrow(id);
             Region region = awsHelper.getRegion(account);
 
@@ -51,6 +51,7 @@ public class AWSServicesImpl implements AWSServices {
 
     @Override
     public List<RdsInstanceDto> fetchRdsInstances(Long id) {
+
         try {
             Accounts account = awsHelper.getAccountOrThrow(id);
             Region region = awsHelper.getRegion(account);
@@ -67,7 +68,8 @@ public class AWSServicesImpl implements AWSServices {
                                     .map(tag -> tag.value())
                                     .orElse("Unnamed"),
                             account.getRegion(),
-                            db.dbInstanceStatus()
+                            db.dbInstanceStatus(),
+                            db.engine()
                     ))
                     .toList();
 
@@ -78,6 +80,7 @@ public class AWSServicesImpl implements AWSServices {
 
     @Override
     public List<AsgDto> fetchAutoScalingGroups(Long id) {
+
         try {
             Accounts account = awsHelper.getAccountOrThrow(id);
             Region region = awsHelper.getRegion(account);
@@ -87,15 +90,18 @@ public class AWSServicesImpl implements AWSServices {
 
             return asgClient.describeAutoScalingGroups().autoScalingGroups().stream()
                     .map(group -> new AsgDto(
-                            group.autoScalingGroupName(),
+                            group.autoScalingGroupName(), // resourceId
                             group.tags().stream()
                                     .filter(tag -> tag.key().equalsIgnoreCase("Name"))
                                     .findFirst()
                                     .map(tag -> tag.value())
-                                    .orElse("Unnamed"),
-                            account.getRegion(),
-                            group.status() != null ? group.status() :
-                                    (group.desiredCapacity() > 0 ? "Enabled" : "Disabled")
+                                    .orElse("Unnamed"), // resourceName
+                            account.getRegion(),          // region
+                            group.desiredCapacity(),      // desiredCapacity
+                            group.minSize(),              // minSize
+                            group.maxSize(),              // maxSize
+                            group.status() != null ? group.status()
+                                    : (group.desiredCapacity() > 0 ? "Enabled" : "Disabled") // status
                     ))
                     .toList();
 
@@ -103,6 +109,7 @@ public class AWSServicesImpl implements AWSServices {
             throw new RuntimeException("Error fetching Auto Scaling Groups", e);
         }
     }
+
 
 
 

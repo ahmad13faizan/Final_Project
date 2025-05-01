@@ -14,7 +14,6 @@ const Navbar = () => {
   const [hover, setHover] = useState(false);
 
   const buttonStyle = {
-  
     padding: "8px 16px",
     borderRadius: "6px",
     border: " solid 1px",
@@ -22,29 +21,30 @@ const Navbar = () => {
     cursor: "pointer",
     alignItems: "center",
     transition: "all 0.3s ease",
-  
+
     // Add hover styles
     boxShadow: hover
       ? "0 0px 8px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(0, 0, 0, 0.1)"
       : "none",
     filter: hover ? "brightness(0.98) contrast(1.05)" : "none",
   };
-  
+
   const handleLogout = async () => {
     const confirmed = window.confirm("Are you sure you want to log out?");
     if (!confirmed) return;
-  
+
     try {
       await api.post("/api/logout");
       localStorage.removeItem("token");
       localStorage.removeItem("role");
+      localStorage.removeItem("email");
+   
       navigate("/login");
+  
     } catch (error) {
-      console.error("Logout failed:", error);
-      alert("Logout failed. Please try again.");
+      alert("Logout failed."+error);
     }
   };
-  
 
   return (
     <nav className={styles.navbar}>
@@ -67,11 +67,25 @@ const Navbar = () => {
         />
 
         <div style={{ display: "flex", flexDirection: "column" }}>
-          {role === "ROLE_ADMIN" && <Link to="/admin"><b> Admin</b></Link>}
-          {role === "ROLE_CUSTOMER" && <Link to="/customer"><b>Customer</b></Link>}
-          {role === "ROLE_READ_ONLY" && <Link to="/readonly"><b>Read-Only</b></Link>}
+          {role === "ROLE_ADMIN" && (
+            <Link to="/home">
+              <b> Admin</b>
+            </Link>
+          )}
+          {role === "ROLE_CUSTOMER" && (
+            <Link to="/customer">
+              <b>Customer</b>
+            </Link>
+          )}
+          {role === "ROLE_READ_ONLY" && (
+            <Link to="/readonly">
+              <b>Read-Only</b>
+            </Link>
+          )}
 
-          <span style={{ marginRight: "18px", fontWeight: "500" }}>{email}</span>
+          <span style={{ marginRight: "18px", fontWeight: "500" }}>
+            {email}
+          </span>
         </div>
 
         {/* Logout Button with FaSignOutAlt Icon */}
@@ -81,8 +95,9 @@ const Navbar = () => {
           onClick={handleLogout}
           style={buttonStyle}
         >
-          <FaSignOutAlt size={12} style={{ marginRight: "8px" }} /> {/* Logout icon */}
-          <div style={{  fontSize: "16px" }}>Logout</div>
+          <FaSignOutAlt size={12} style={{ marginRight: "8px" }} />{" "}
+          {/* Logout icon */}
+          <div style={{ fontSize: "16px" }}>Logout</div>
         </div>
       </div>
     </nav>

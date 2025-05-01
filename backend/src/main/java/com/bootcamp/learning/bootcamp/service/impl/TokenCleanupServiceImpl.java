@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class TokenCleanupServiceImpl implements TokenCleanupService {
 
     private final LoginTokenRepository tokenRepository;
-    private static final long TOKEN_EXPIRY_MINUTES = 1; // set your expiry time here
+    private static final long TOKEN_EXPIRY_MINUTES = 15; // set your expiry time here
 
     public TokenCleanupServiceImpl(LoginTokenRepository tokenRepository) {
         this.tokenRepository = tokenRepository;

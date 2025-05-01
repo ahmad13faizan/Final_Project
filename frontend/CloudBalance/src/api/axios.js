@@ -4,7 +4,10 @@ const api = axios.create({
   baseURL: 'http://localhost:8080', // Replace with your actual backend URL
   headers: {
     'Content-Type': 'application/json',
-  }
+  },
+  withCredentials: true,            // ← allow sending & receiving cookies
+  xsrfCookieName: 'XSRF-TOKEN',     // ← name of the cookie Spring will set
+  xsrfHeaderName: 'X-XSRF-TOKEN', 
 });
 
 // 🔐 Attach token on every request

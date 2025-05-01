@@ -1,5 +1,5 @@
 /* eslint-disable no-debugger */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import styles from "../styles/login.module.scss";
@@ -14,8 +14,14 @@ const Login = () => {
 
   const navigate = useNavigate();
 
+  
+
   const handleLogin = async (e) => {
+
+  
+
     e.preventDefault();
+
 
     try {
       const response = await api.post("/api/login", {
@@ -32,7 +38,7 @@ const Login = () => {
       localStorage.setItem("email", email);
 
       if (data.role === "ROLE_ADMIN") {
-        navigate("/admin");
+        navigate("/home");
       } else if (data.role === "ROLE_CUSTOMER") {
         navigate("/customer");
       } else if (data.role === "ROLE_READ_ONLY") {
@@ -43,10 +49,17 @@ const Login = () => {
     } catch (error) {
       setemail("");
       setPassword("");
-      setMessage(
-        "Login Failed: " +
-          (error.response?.data?.error || "Invalid credentials")
-      );
+      if (error.response) {
+        // Server is up, responded with an error (e.g. 400, 401, etc.)
+        setMessage("Login Failed: " + (error.response.data?.error || "Server-side error." +error));
+      } else if (error.request) {
+        // Request was made, but no response — likely server is down or network issue
+        setMessage("Login Failed: Server is not responding. Please try again later.");
+      } else {
+        // Some other error occurred while setting up the request
+        setMessage("Login Failed: " + error.message);
+      }
+      
     }
   };
 

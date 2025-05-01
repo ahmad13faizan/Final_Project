@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import registerFormConfig from "../config/registerFormConfig";
 import styles from "../styles/register.module.scss";
 import api from "../api/axios";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
 import {
@@ -18,11 +18,9 @@ import {
 } from "@mui/material";
 
 const Register = () => {
-
   const navigate = useNavigate();
   const location = useLocation();
   const editUser = location.state?.editUser || null;
-
 
   console.log("Edit User:", editUser);
   const [formData, setFormData] = useState({
@@ -70,7 +68,6 @@ const Register = () => {
       }
     }
   }, [editUser]);
-
 
   useEffect(() => {
     if (roles.length > 0 && formData.roleId) {
@@ -122,17 +119,16 @@ const Register = () => {
     }));
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Password match check
     if (formData.password !== formData.password2) {
       setError("Passwords do not match");
       setSuccess("");
       return;
     }
-  
+
     // Construct the payload
     const payload = {
       email: formData.email,
@@ -141,7 +137,7 @@ const Register = () => {
       password2: formData.password2,
       roleId: parseInt(formData.roleId),
     };
-  
+
     // If customer, add accountIds
     const selectedRole = roles.find(
       (role) => role.id === parseInt(formData.roleId)
@@ -149,25 +145,28 @@ const Register = () => {
     if (selectedRole?.name === "ROLE_CUSTOMER") {
       payload.accountIds = selectedAccounts.map((acc) => acc.accountId);
     }
-  
+
     try {
       if (editUser) {
         // EDIT user → PUT to /api/users/{id}
         await api.put(`/api/users/${editUser.id}`, payload);
         setSuccess("User updated successfully");
+        alert("User updated successfully")
       } else {
-        // REGISTER user → POST to /api/register
-        await api.post("/api/register", payload);
-        setSuccess("Registered successfully");
+        // REGISTER user → POST to /api/users
+        await api.post("/api/users", payload);
+        setSuccess("User added successfully");
+        alert("User added successfully")
       }
-  
+
       setError("");
       // Optional: navigate after success
-      setTimeout(() => navigate("/admin"), 1000);
+      setTimeout(() => navigate("/home"), 1000);
     } catch (err) {
       // Display server-side validation or message
       if (err.response && err.response.data) {
-        const serverError = err.response.data.message || JSON.stringify(err.response.data);
+        const serverError =
+          err.response.data.message || JSON.stringify(err.response.data);
         setError("Server error: " + serverError);
       } else {
         setError("An unexpected error occurred.");
@@ -175,9 +174,6 @@ const Register = () => {
       setSuccess("");
     }
   };
-  
-  
-  
 
   const cancelButtonStyle = {
     marginRight: "auto",
@@ -194,7 +190,7 @@ const Register = () => {
   };
 
   const handleCancel = () => {
-    navigate("/admin"); 
+    navigate("/home");
   };
 
   return (
@@ -209,12 +205,9 @@ const Register = () => {
         >
           Cancel
         </button>
-
-        
         <h2>{editUser ? "Edit User" : "Add User"}</h2>
-          <div className={styles.spacerDiv}></div> {/* Empty div to take up space */}
-
-
+        <div className={styles.spacerDiv}></div>{" "}
+        {/* Empty div to take up space */}
         {registerFormConfig.map((field) => (
           <div key={field.name} className={styles.formField}>
             {field.type === "select" ? (
@@ -243,7 +236,6 @@ const Register = () => {
             )}
           </div>
         ))}
-
         {/* Account Selection Panels */}
         {(availableAccounts.length > 0 || selectedAccounts.length > 0) && (
           <div style={{ marginTop: "2rem" }}>
@@ -311,7 +303,6 @@ const Register = () => {
             </Grid>
           </div>
         )}
-
         <div className={styles.formField}>
           <button
             type="submit"

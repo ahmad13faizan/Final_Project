@@ -19,13 +19,12 @@ import "../styles/common.scss";
 import AWSDashboard from "../components/admin_components/AWSDashboard";
 import Cost_Explorer from "./admin_components/Cost_Explorer";
 
-
 const AppRoutes = () => {
   const location = useLocation();
   const userLoggedIn = localStorage.getItem("token") !== null;
   const showNavbar =
     userLoggedIn &&
-    /^\/(admin|customer|readonly|register)/.test(location.pathname);
+    /^\/(home|customer|readonly|register)/.test(location.pathname);
 
   return (
     <>
@@ -35,9 +34,11 @@ const AppRoutes = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<Login />} />
 
+        
+
         {/* Admin */}
         <Route element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]} />}>
-          <Route path="/admin" element={<MainDashboard />}>
+          <Route path="/home" element={<MainDashboard />}>
             <Route index element={<UserTable />} />
             <Route path="register" element={<Register />} />
             <Route path="edit/:id" element={<Register editUser={true} />} />
@@ -46,18 +47,29 @@ const AppRoutes = () => {
             <Route path="onboarding3" element={<Onboarding3 />} />
             <Route path="thank-you" element={<ThankYouPage />} />
             <Route path="aws" element={<AWSDashboard />} />
-            <Route path="cost" element={<Cost_Explorer/>}  />
+            <Route path="cost" element={<Cost_Explorer />} />
           </Route>
         </Route>
 
         {/* Customer */}
         <Route element={<ProtectedRoute allowedRoles={["ROLE_CUSTOMER"]} />}>
-          <Route path="/customer" element={<CustomerDashboard />} />
+          <Route path="/customer" element={<MainDashboard />}>
+          <Route index element={<CustomerDashboard />} />
+          <Route path="aws" element={<AWSDashboard />} />
+          <Route path="cost" element={<Cost_Explorer />} />
+          
+          </Route>
         </Route>
 
         {/* Read Only */}
         <Route element={<ProtectedRoute allowedRoles={["ROLE_READ_ONLY"]} />}>
-          <Route path="/readonly" element={<ReadOnlyDashboard />} />
+          <Route path="/readonly" element={<MainDashboard />} >
+            <Route index  element={<UserTable />} />
+            <Route path="aws" element={<AWSDashboard />} />
+            <Route path="cost" element={<Cost_Explorer />} />
+            
+          </Route>
+
         </Route>
 
         <Route path="/error" element={<Unauthorized />} />

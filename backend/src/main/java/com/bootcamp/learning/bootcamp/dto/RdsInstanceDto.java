@@ -8,6 +8,7 @@ import lombok.Data;
 public class RdsInstanceDto {
     private String id;
     private String name;
+    private String engine;
     private String region;
     private String status;
 }

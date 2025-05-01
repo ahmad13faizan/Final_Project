@@ -3,7 +3,6 @@ package com.bootcamp.learning.bootcamp.config.security;
 import com.bootcamp.learning.bootcamp.UserDetails.CustomUserDetails;
 import com.bootcamp.learning.bootcamp.entity.LoginToken;
 import com.bootcamp.learning.bootcamp.entity.User;
-import com.bootcamp.learning.bootcamp.enums.RoleType;
 import com.bootcamp.learning.bootcamp.repository.LoginTokenRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -11,90 +10,75 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+
 
 @Component
 public class TokenAuthFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private LoginTokenRepository tokenRepository;
-
     private static final long TOKEN_EXPIRY_MINUTES = 15;
+
+    @Autowired private LoginTokenRepository tokenRepository;
+    @Autowired private JsonAuthenticationEntryPoint jsonEntryPoint;  // your custom entry-point
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
-                                    FilterChain filterChain)
+                                    FilterChain chain)
             throws ServletException, IOException {
 
-        String path = request.getRequestURI();
-
-        // Allow unauthenticated access to /api/login
-        if ("/api/login".equals(path)) {
-            filterChain.doFilter(request, response);
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            chain.doFilter(request, response);
             return;
         }
 
-        String token = request.getHeader("Authorization");
+        String header = request.getHeader("Authorization");
+        if (header != null && !header.isBlank()) {
+            String token = header.startsWith("Bearer ")
+                    ? header.substring(7)
+                    : header;
 
-        if (token == null || token.trim().isEmpty()) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Missing or empty Authorization header.");
-            return;
+            Optional<LoginToken> opt = tokenRepository.findByToken(token);
+            if (opt.isEmpty()) {
+                // directly produce 401 JSON
+                jsonEntryPoint.commence(
+                        request,
+                        response,
+                        new AuthenticationException("Invalid token") {}
+                );
+                return;
+            }
+
+            LoginToken loginToken = opt.get();
+            if (loginToken.getCreatedAt().plusMinutes(TOKEN_EXPIRY_MINUTES)
+                    .isBefore(LocalDateTime.now())) {
+                jsonEntryPoint.commence(
+                        request,
+                        response,
+                        new AuthenticationException("Token expired") {}
+                );
+                return;
+            }
+
+            // ✅ valid token, set authentication
+            User user = loginToken.getUser();
+            var authority = new SimpleGrantedAuthority(user.getRole().getName().name());
+            var auth = new UsernamePasswordAuthenticationToken(
+                    new CustomUserDetails(user),
+                    null,
+                    List.of(authority));
+            SecurityContextHolder.getContext().setAuthentication(auth);
         }
 
-        Optional<LoginToken> loginTokenOpt = tokenRepository.findByToken(token);
-
-        if (loginTokenOpt.isEmpty()) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Invalid token.");
-            return;
-        }
-
-        LoginToken loginToken = loginTokenOpt.get();
-
-        // Check token expiry
-        if (loginToken.getCreatedAt().plusMinutes(TOKEN_EXPIRY_MINUTES).isBefore(LocalDateTime.now())) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Token expired. Please login again.");
-            return;
-        }
-
-        User user = loginToken.getUser();
-        RoleType roleType = user.getRole().getName();
-
-        // Create and set Spring Security authentication context
-        CustomUserDetails userDetails = new CustomUserDetails(user);
-        UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        if (
-                path.equals("/api/logout") ||
-                        path.equals("/api/accounts") ||
-                        path.startsWith("/api/AWSAccount")
-        ) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-
-
-        // 🔒 For all other endpoints, only allow ADMIN
-        if (!RoleType.ROLE_ADMIN.equals(roleType)) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().write("Access denied. Admin role required.");
-            return;
-        }
-
-        filterChain.doFilter(request, response);
+        chain.doFilter(request, response);
     }
-
 }

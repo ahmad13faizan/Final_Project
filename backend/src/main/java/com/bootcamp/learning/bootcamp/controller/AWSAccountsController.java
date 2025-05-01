@@ -24,19 +24,19 @@ public class AWSAccountsController {
     @Autowired
     private AccountsService service;
 
-    @GetMapping("/{id}/ec2")
+    @GetMapping("/ec2/{id}")
     public ResponseEntity<List<Ec2InstanceDto>> getEc2Instances(@PathVariable Long id) {
         List<Ec2InstanceDto> instances = awsServices.fetchInstances(id);
         return ResponseEntity.ok(instances);
     }
 
-    @GetMapping("/{id}/rds")
+    @GetMapping("/rds/{id}")
     public ResponseEntity<List<RdsInstanceDto>> getRdsInstances(@PathVariable Long id) {
         List<RdsInstanceDto> instances = awsServices.fetchRdsInstances(id);
         return ResponseEntity.ok(instances);
     }
 
-    @GetMapping("/{id}/asg")
+    @GetMapping("/asg/{id}")
     public ResponseEntity<List<AsgDto>> getAsgGroups(@PathVariable Long id) {
         List<AsgDto> groups = awsServices.fetchAutoScalingGroups(id);
         return ResponseEntity.ok(groups);

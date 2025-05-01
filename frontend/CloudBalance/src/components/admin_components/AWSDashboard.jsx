@@ -21,7 +21,7 @@ import {
   IconButton,
   Popover,
 } from "@mui/material";
-import FilterListIcon from '@mui/icons-material/FilterList';
+import FilterListIcon from "@mui/icons-material/FilterList";
 import { FaLock, FaCloud } from "react-icons/fa";
 import api from "../../api/axios";
 
@@ -56,6 +56,7 @@ const AWSDashboard = ({ onAccountChange, selectedAccountId = "" }) => {
       try {
         const response = await api.get("/api/accounts");
         setAccounts(response.data);
+        setSelectedAccount(response.data[5].accountId)
       } catch (error) {
         console.error("Failed to fetch accounts", error);
       } finally {
@@ -69,11 +70,11 @@ const AWSDashboard = ({ onAccountChange, selectedAccountId = "" }) => {
     if (!accountId) return;
     setLoadingResources(true);
     try {
-      const response = await api.get(`/api/AWSAccount/${accountId}/${type}`);
+      const response = await api.get(`/api/AWSAccount/${type}/${accountId}`);
       setResources(response.data);
       // initialize filters
       const initial = {};
-      (response.data[0] ? Object.keys(response.data[0]) : []).forEach(key => {
+      (response.data[0] ? Object.keys(response.data[0]) : []).forEach((key) => {
         initial[key] = "";
       });
       setFilters(initial);
@@ -110,11 +111,11 @@ const AWSDashboard = ({ onAccountChange, selectedAccountId = "" }) => {
   };
 
   const handleFilterChange = (e) => {
-    setFilters(prev => ({ ...prev, [activeColumn]: e.target.value }));
+    setFilters((prev) => ({ ...prev, [activeColumn]: e.target.value }));
   };
 
   const filteredResources = useMemo(() => {
-    return resources.filter(item => {
+    return resources.filter((item) => {
       return Object.entries(filters).every(([key, val]) => {
         if (!val) return true;
         const cell = String(item[key] ?? "").toLowerCase();
@@ -125,7 +126,7 @@ const AWSDashboard = ({ onAccountChange, selectedAccountId = "" }) => {
 
   return (
     <Box>
-      <Box sx={{  display: "flex", justifyContent: "flex-end", p: 2 }}>
+      <Box sx={{ display: "flex", justifyContent: "flex-end", p: 2 }}>
         <FormControl sx={{ minWidth: 220 }} size="small" variant="outlined">
           <InputLabel id="account-select-label">Select Account</InputLabel>
           {loadingAccounts ? (
@@ -159,11 +160,26 @@ const AWSDashboard = ({ onAccountChange, selectedAccountId = "" }) => {
         </FormControl>
       </Box>
 
-      <Box sx={{ height:"75vh", boxShadow: 2, m: 2, px: 2, borderRadius: 2, backgroundColor: "#fff", p: 2 }}>
+      <Box
+        sx={{
+          height: "75vh",
+          boxShadow: 2,
+          m: 2,
+          px: 2,
+          borderRadius: 2,
+          backgroundColor: "#fff",
+          p: 2,
+        }}
+      >
         <Typography variant="h5" fontWeight={600} sx={{ mb: 2 }}>
           AWS Resources
         </Typography>
-        <Tabs value={tab} onChange={handleTabChange} textColor="primary" indicatorColor="primary">
+        <Tabs
+          value={tab}
+          onChange={handleTabChange}
+          textColor="primary"
+          indicatorColor="primary"
+        >
           <Tab label="EC2" value="ec2" />
           <Tab label="RDS" value="rds" />
           <Tab label="ASG" value="asg" />
@@ -181,10 +197,21 @@ const AWSDashboard = ({ onAccountChange, selectedAccountId = "" }) => {
               <TableHead>
                 <TableRow>
                   {Object.keys(resources[0] || filters).map((key) => (
-                    <TableCell sx={{ backgroundColor: "#1976b2", color: "white" }} key={key}>
+                    <TableCell
+                      sx={{ backgroundColor: "#1976b2", color: "white" }}
+                      key={key}
+                    >
                       <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <Typography variant="subtitle2"><b>{key}</b></Typography>
-                        <IconButton size="small" onClick={e => handleFilterOpen(key, e.currentTarget)} sx={{ color: "white", ml: 1 }}>
+                        <Typography variant="subtitle2">
+                          <b>{key}</b>
+                        </Typography>
+                        <IconButton
+                          size="small"
+                          onClick={(e) =>
+                            handleFilterOpen(key, e.currentTarget)
+                          }
+                          sx={{ color: "white", ml: 1 }}
+                        >
                           <FilterListIcon fontSize="small" />
                         </IconButton>
                       </Box>

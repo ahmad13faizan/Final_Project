@@ -1,9 +1,16 @@
 package com.bootcamp.learning.bootcamp.util;
 
 import com.bootcamp.learning.bootcamp.entity.Accounts;
+import com.bootcamp.learning.bootcamp.entity.User;
+import com.bootcamp.learning.bootcamp.enums.RoleType;
 import com.bootcamp.learning.bootcamp.repository.AccountsRepository;
+import com.bootcamp.learning.bootcamp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import software.amazon.awssdk.auth.credentials.*;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sts.StsClient;

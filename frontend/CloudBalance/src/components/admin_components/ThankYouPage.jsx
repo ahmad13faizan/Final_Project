@@ -11,18 +11,16 @@ const ThankYouPage = () => {
         alignItems: "center",
         backgroundColor: "none",
         px: 2,
-    
       }}
     >
       <Paper
-      
-       elevation={0}
+        elevation={0}
         sx={{
           width: "100%",
           maxWidth: "600px",
           textAlign: "center",
           p: 4,
-   
+
           backgroundColor: "transparent",
         }}
       >
@@ -36,9 +34,8 @@ const ThankYouPage = () => {
         </Typography>
         <Typography variant="body1" gutterBottom>
           If you have additional accounts to onboard, please{" "}
-          <Link href="/admin/onboarding">click Onboard</Link> to proceed.
+          <Link href="/home/onboarding">click Onboard</Link> to proceed.
         </Typography>
-        
       </Paper>
     </Box>
   );
