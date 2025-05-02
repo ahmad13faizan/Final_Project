@@ -192,17 +192,18 @@ public class SnowflakeRepository implements BaseRepository<CostExplorerEntity> {
         }
 
         // 2) build SQL coalesce NULL→'Unknown'
-        String grpExpr = "COALESCE(" + groupByColumn + ",'Unknown')";
         StringBuilder sql = new StringBuilder()
                 .append("SELECT ")
-                .append(grpExpr).append(" AS grp, ")
+                .append(groupByColumn).append(" AS grp, ")
                 .append("MYCLOUD_STARTYEAR, MYCLOUD_STARTMONTH, ")
                 .append("SUM(LINEITEM_USAGEAMOUNT * LINEITEM_UNBLENDEDCOST) as Total_Cost ")
                 .append("FROM cost_explorer ")
                 .append("WHERE ")
                 // date-range logic
                 .append("(MYCLOUD_STARTYEAR > ? OR (MYCLOUD_STARTYEAR = ? AND MYCLOUD_STARTMONTH >= ?)) ")
-                .append("AND (MYCLOUD_STARTYEAR < ? OR (MYCLOUD_STARTYEAR = ? AND MYCLOUD_STARTMONTH <= ?)) ");
+                .append("AND (MYCLOUD_STARTYEAR < ? OR (MYCLOUD_STARTYEAR = ? AND MYCLOUD_STARTMONTH <= ?)) ")
+                .append("AND ").append(groupByColumn).append(" IS NOT NULL ");
+
 
         // 3) add IN-clauses for each filter column
         for (Map.Entry<String,List<Object>> e : filters.entrySet()) {
@@ -216,7 +217,7 @@ public class SnowflakeRepository implements BaseRepository<CostExplorerEntity> {
         }
 
         sql.append("GROUP BY ")
-                .append(grpExpr)
+                .append(groupByColumn)
                 .append(", MYCLOUD_STARTYEAR, MYCLOUD_STARTMONTH ")
                 .append("ORDER BY MYCLOUD_STARTYEAR, MYCLOUD_STARTMONTH");
 

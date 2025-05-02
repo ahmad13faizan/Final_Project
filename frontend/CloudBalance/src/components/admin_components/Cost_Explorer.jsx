@@ -1,6 +1,12 @@
-// src/components/Cost_Explorer.jsx
 import React, { useEffect, useState } from "react";
+
 import {
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
   Box,
   Button,
   Checkbox,
@@ -9,7 +15,7 @@ import {
   MenuItem,
   Paper,
   TextField,
-  Typography
+  Typography,
 } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -27,20 +33,19 @@ const Cost_Explorer = () => {
   const { columns, loading } = useSelector((state) => state.costExplorer);
 
   const [selectedGroup, setSelectedGroup] = useState("PRODUCT_PRODUCTNAME");
-  const [checkedValues, setCheckedValues] = useState({});   // { col: [vals] }
-  const [columnValues, setColumnValues] = useState({});     // { col: [all vals] }
-  const [openValues, setOpenValues] = useState({});         // { col: bool }
+  const [checkedValues, setCheckedValues] = useState({}); // { col: [vals] }
+  const [columnValues, setColumnValues] = useState({}); // { col: [all vals] }
+  const [openValues, setOpenValues] = useState({}); // { col: bool }
   const [showFilters, setShowFilters] = useState(false);
   const [data, setData] = useState([]);
 
-  const [startDate, setStartDate] = useState(dayjs('2025-04-01'));
+  const [startDate, setStartDate] = useState(dayjs("2025-04-01"));
 
   const [endDate, setEndDate] = useState(dayjs());
 
   const [anchorEl, setAnchorEl] = useState(null);
   const maxButtons = 8;
 
-  // load column names
   useEffect(() => {
     dispatch(fetchColumns());
   }, [dispatch]);
@@ -48,44 +53,44 @@ const Cost_Explorer = () => {
   // re-fetch when anything changes
   useEffect(() => {
     if (!selectedGroup) return;
-  
+
     const params = new URLSearchParams();
     params.set("groupBy", selectedGroup);
     params.set("start", startDate.format("YYYY-MM-DD"));
-    params.set("end",   endDate.format("YYYY-MM-DD"));
-  
-    // Only add filters for columns whose array has length>0
+    params.set("end", endDate.format("YYYY-MM-DD"));
+
+    // … inside your effect that builds params …
     Object.entries(checkedValues)
-      .filter(([, vals]) => vals.length > 0)            // ← skip empty lists
+      .filter(([, vals]) => vals.length > 0)
       .forEach(([col, vals]) => {
-        // quote any with spaces
-        const encoded = vals
-          .map(v => (v.includes(" ") ? `"${v}"` : v))
-          .join(",");
-        params.set(col, encoded);
+        params.set(col, vals.join(",")); // ← no .map(v => `"${v}"`)
       });
-  
+
     api
       .get(`/api/costExplorer/dynamic-costs-pivoted?${params.toString()}`)
-      .then(res => setData(res.data))
+      .then((res) => setData(res.data))
       .catch(console.error);
   }, [selectedGroup, checkedValues, startDate, endDate]);
-  
+
   // group-by handlers
-  const handleGroupClick = col => { setSelectedGroup(col); setAnchorEl(null); };
-  const handleMoreClick = e => setAnchorEl(e.currentTarget);
+  const handleGroupClick = (col) => {
+    setSelectedGroup(col);
+    setAnchorEl(null);
+  };
+  const handleMoreClick = (e) => setAnchorEl(e.currentTarget);
   const handleMoreClose = () => setAnchorEl(null);
 
   // toggle filters panel
-  const handleFilterToggle = () => setShowFilters(f => !f);
+  const handleFilterToggle = () => setShowFilters((f) => !f);
 
   // toggle a filter column open/closed and load its values
-  const toggleFilterOpen = col => {
-    setOpenValues(o => {
+  const toggleFilterOpen = (col) => {
+    setOpenValues((o) => {
       const isOpen = !o[col];
       if (isOpen && !columnValues[col]) {
-        api.get(`/api/costExplorer/values/${col}`)
-          .then(r => setColumnValues(v => ({ ...v, [col]: r.data })))
+        api
+          .get(`/api/costExplorer/values/${col}`)
+          .then((r) => setColumnValues((v) => ({ ...v, [col]: r.data })))
           .catch(console.error);
       }
       return { ...o, [col]: isOpen };
@@ -94,10 +99,10 @@ const Cost_Explorer = () => {
 
   // toggle individual value in a filter column
   const handleValueCheck = (col, val) => {
-    setCheckedValues(prev => {
+    setCheckedValues((prev) => {
       const list = prev[col] || [];
       const next = list.includes(val)
-        ? list.filter(x => x !== val)
+        ? list.filter((x) => x !== val)
         : [...list, val];
       return { ...prev, [col]: next };
     });
@@ -105,35 +110,59 @@ const Cost_Explorer = () => {
 
   // build group-by button lists
   const ordered = selectedGroup
-    ? [selectedGroup, ...columns.filter(c => c !== selectedGroup)]
+    ? [selectedGroup, ...columns.filter((c) => c !== selectedGroup)]
     : columns;
   const visibleButtons = ordered.slice(0, maxButtons);
   const overflowButtons = ordered.slice(maxButtons);
 
+  // derive sorted list of month‑keys across all data rows:
+  const monthKeys = React.useMemo(() => {
+    const set = new Set();
+    data.forEach((r) => {
+      Object.keys(r.monthToCost || {}).forEach((m) => set.add(m));
+    });
+    return Array.from(set).sort(); // e.g. ["2025-04","2025-05",…]
+  }, [data]);
+
+  // helper to sum all month values for a row:
+  const sumRow = (row) =>
+    monthKeys.reduce((acc, m) => acc + (row.monthToCost[m] || 0), 0);
+
   return (
     <Box m={2} bgcolor="#f0f0f0" p={2} borderRadius={2}>
-      <Typography variant="h4" gutterBottom>Cost Explorer</Typography>
+      <Typography sx={{ fontWeight: "600", fontSize: "33px" }} gutterBottom>
+        Cost Explorer
+      </Typography>
       {loading && <CircularProgress />}
 
       {/* Group-by + More */}
       <Box display="flex" alignItems="center" mb={2}>
-        <Box sx={{ flex:1, display:"flex", gap:1, flexWrap:"wrap", overflowX:"auto", py:1 }}>
-          {visibleButtons.map(col => (
+        <Box
+          sx={{
+            flex: 1,
+            display: "flex",
+            gap: 1,
+            flexWrap: "wrap",
+            overflowX: "auto",
+            py: 1,
+          }}
+        >
+          {visibleButtons.map((col) => (
             <Button
               key={col}
-              variant={col===selectedGroup ? "contained" : "outlined"}
+              variant={col === selectedGroup ? "contained" : "outlined"}
               sx={{
-                bgcolor: col===selectedGroup ? "#0056b3" : "white",
-                color: col===selectedGroup ? "white" : "#0056b3",
+                bgcolor: col === selectedGroup ? "#0056b3" : "white",
+                color: col === selectedGroup ? "white" : "#0056b3",
                 borderColor: "#0056b3",
-                textTransform: "none"
+                textTransform: "none",
               }}
-              onClick={()=>handleGroupClick(col)}
+              onClick={() => handleGroupClick(col)}
             >
               {formatColumn(col)}
             </Button>
           ))}
-          {overflowButtons.length>0 && (
+          {overflowButtons.length > 0 && (
             <>
               <Button
                 variant="outlined"
@@ -142,13 +171,23 @@ const Cost_Explorer = () => {
                   bgcolor: anchorEl ? "#0056b3" : "white",
                   color: anchorEl ? "white" : "#0056b3",
                   borderColor: "#0056b3",
-                  textTransform: "none"
+                  textTransform: "none",
                 }}
                 endIcon={<MoreHorizIcon />}
-              >More</Button>
-              <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMoreClose}>
-                {overflowButtons.map(col => (
-                  <MenuItem key={col} onClick={()=>handleGroupClick(col)} sx={{ color:"#0056b3" }}>
+              >
+                More
+              </Button>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMoreClose}
+              >
+                {overflowButtons.map((col) => (
+                  <MenuItem
+                    key={col}
+                    onClick={() => handleGroupClick(col)}
+                    sx={{ color: "#0056b3" }}
+                  >
                     {formatColumn(col)}
                   </MenuItem>
                 ))}
@@ -158,7 +197,14 @@ const Cost_Explorer = () => {
         </Box>
         <FaSlidersH
           onClick={handleFilterToggle}
-          style={{ cursor:"pointer", marginLeft:8, padding:8, backgroundColor:"#0056b3", color:"white", borderRadius:4 }}
+          style={{
+            cursor: "pointer",
+            marginLeft: 8,
+            padding: 8,
+            backgroundColor: "#0056b3",
+            color: "white",
+            borderRadius: 4,
+          }}
         />
       </Box>
 
@@ -166,55 +212,220 @@ const Cost_Explorer = () => {
       <Box mb={2} display="flex" gap={2} flexWrap="wrap">
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker
+            sx={{ background: "white" }}
             label="Start Date"
             value={startDate}
-            onChange={d=>setStartDate(d)}
-            renderInput={params => (
-              <TextField {...params} size="small" sx={{ "& .MuiInputBase-root":{height:32}, minWidth:120 }} />
+            onChange={(d) => setStartDate(d)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                size="small"
+                sx={{ "& .MuiInputBase-root": { height: 32 }, minWidth: 120 }}
+              />
             )}
           />
         </LocalizationProvider>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker
+            sx={{ background: "white" }}
             label="End Date"
             value={endDate}
-            onChange={d=>setEndDate(d)}
-            renderInput={params => (
-              <TextField {...params} size="small" sx={{ "& .MuiInputBase-root":{height:32}, minWidth:120 }} />
+            onChange={(d) => setEndDate(d)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                size="small"
+                sx={{ "& .MuiInputBase-root": { height: 32 }, minWidth: 120 }}
+              />
             )}
           />
         </LocalizationProvider>
       </Box>
 
       {/* Charts + Filters */}
-      <Box sx={{ display:"flex", gap:2, bgcolor:"#fff", p:2, borderRadius:2 }}>
-        <Box sx={{ flexGrow:1 }}> charts boxes area </Box>
+      <Box
+        sx={{ display: "flex", gap: 2, bgcolor: "#fff", p: 2, borderRadius: 2 }}
+      >
+        <Box sx={{ flexGrow: 1, flexDirection: "column" }}>
+          {" "}
+          charts and table boxes area
+          <TableContainer
+            elevation={2}
+            component={Paper}
+            sx={{ maxHeight: 400, flex: 1 }}
+          >
+            <Table stickyHeader size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell
+                    sx={{
+                      color: "white",
+                      borderRight: "solid grey 1px",
+                      fontWeight: "bold",
+                      background: "#0056b3",
+                    }}
+                  >
+                    {formatColumn(selectedGroup)}
+                  </TableCell>
+                  {monthKeys.map((m) => (
+                    <TableCell
+                      sx={{
+                        color: "white",
+                        borderRight: "solid grey 1px",
+                        fontWeight: "bold",
+                        background: "#0056b3",
+                      }}
+                      key={m}
+                      align="right"
+                    >
+                      {m}
+                    </TableCell>
+                  ))}
+                  <TableCell
+                    sx={{
+                      color: "white",
+                      background: "#0056b3",
+                      fontWeight: "bold",
+                    }}
+                    align="right"
+                  >
+                    Total Cost
+                  </TableCell>
+                </TableRow>
+              </TableHead>
 
+              <TableBody>
+                {data.map((row, i) => {
+                  const total = sumRow(row);
+                  return (
+                    <TableRow key={i}>
+                      <TableCell sx={{ borderRight: "solid grey 1px" }}>
+                        {row.groupValue}
+                      </TableCell>
+                      {monthKeys.map((m) => (
+                        <TableCell
+                          sx={{ borderRight: "solid grey 1px" }}
+                          key={m}
+                          align="right"
+                        >
+                          {(row.monthToCost[m] || 0).toFixed(2)}
+                        </TableCell>
+                      ))}
+                      <TableCell
+                        sx={{ color: "#0056b3", fontWeight: "bold" }}
+                        align="right"
+                      >
+                        {total.toFixed(2)}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
 
+                {/* ─────────────── Grand‑Total Row ─────────────── */}
+                <TableRow sx={{ position: "sticky", bottom: "0" }}>
+                  <TableCell
+                    sx={{
+                      color: "#0056b3",
+                      borderRight: "solid grey 1px",
+                      background: "#c5e0fc",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Grand Total
+                  </TableCell>
+
+                  {monthKeys.map((m) => {
+                    const monthSum = data.reduce(
+                      (sum, r) => sum + (r.monthToCost[m] || 0),
+                      0
+                    );
+                    return (
+                      <TableCell
+                        key={m}
+                        align="right"
+                        sx={{
+                          color: "#0056b3",
+                          borderRight: "solid grey 1px",
+                          fontWeight: "bold",
+                          background: "#c5e0fc",
+                        }}
+                      >
+                        {monthSum.toFixed(2)}
+                      </TableCell>
+                    );
+                  })}
+
+                  {/* overall total of all months & all groups */}
+                  <TableCell
+                    align="right"
+                    sx={{
+                      color: "#0056b3",
+                      fontWeight: "bold",
+                      background: "#c5e0fc",
+                    }}
+                  >
+                    {data
+                      .reduce(
+                        (grand, r) =>
+                          grand +
+                          monthKeys.reduce(
+                            (s, m) => s + (r.monthToCost[m] || 0),
+                            0
+                          ),
+                        0
+                      )
+                      .toFixed(2)}
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
 
         {showFilters && (
-          <Paper variant="outlined" sx={{ p:2, maxWidth:300, maxHeight:400, overflowY:"auto" }}>
-            <Typography sx={{background:"white", position:"sticky",top:"0"}} variant="h6" gutterBottom>Filters</Typography>
-            {columns.map(col => (
+          <Paper
+            elevation={2}
+            sx={{ maxWidth: 300, maxHeight: 400, overflowY: "auto" }}
+          >
+            <Typography
+              sx={{
+                fontSize: "19px",
+                fontWeight: "600",
+                zIndex: "100",
+                color: "white",
+                padding: "6px 8px",
+                background: "#0056b3;",
+                position: "sticky",
+                top: "0",
+              }}
+              variant="h6"
+              gutterBottom
+            >
+              Filters
+            </Typography>
+            {columns.map((col) => (
               <Box key={col} mb={1}>
                 <Box display="flex" alignItems="center">
                   <Checkbox
-                    checked={openValues[col]||false}
-                    onChange={()=>toggleFilterOpen(col)}
+                    checked={openValues[col] || false}
+                    onChange={() => toggleFilterOpen(col)}
                     color="primary"
                   />
-                  <Typography onClick={()=>toggleFilterOpen(col)} sx={{ cursor:"pointer" }}>
+                  <Typography
+                    onClick={() => toggleFilterOpen(col)}
+                    sx={{ cursor: "pointer" }}
+                  >
                     {formatColumn(col)}
                   </Typography>
                 </Box>
                 {openValues[col] && columnValues[col] && (
                   <Box ml={3} mt={0.5} p={1} borderLeft="2px solid #ccc">
-                    {columnValues[col].map(val => (
+                    {columnValues[col].map((val) => (
                       <Box key={val} display="flex" alignItems="center">
                         <Checkbox
                           size="small"
-                          checked={checkedValues[col]?.includes(val)||false}
-                          onChange={()=>handleValueCheck(col,val)}
+                          checked={checkedValues[col]?.includes(val) || false}
+                          onChange={() => handleValueCheck(col, val)}
                         />
                         <Typography variant="body2">{val}</Typography>
                       </Box>
@@ -228,12 +439,14 @@ const Cost_Explorer = () => {
       </Box>
 
       {/* Results */}
-      {data.length>0 && (
+      {data.length > 0 && (
         <Box mt={3}>
-          <Typography variant="h6" gutterBottom>Results</Typography>
-          {data.map((row,i)=>(
-            <Paper key={i} variant="outlined" sx={{ p:1, mb:1 }}>
-              <pre style={{ margin:0 }}>{JSON.stringify(row,null,2)}</pre>
+          <Typography variant="h6" gutterBottom>
+            Results
+          </Typography>
+          {data.map((row, i) => (
+            <Paper key={i} variant="outlined" sx={{ p: 1, mb: 1 }}>
+              <pre style={{ margin: 0 }}>{JSON.stringify(row, null, 2)}</pre>
             </Paper>
           ))}
         </Box>
