@@ -9,19 +9,17 @@
   gap: 1rem;
   width: 220px;
   color: var(--sidebar-text);
-  
 }
 
 .sidebarBtn {
   border-radius: 6px;
   color: var(--sidebar-text);
-  padding:6px 2px;
+  padding: 6px 2px;
   display: flex;
   align-items: center;
   background: none;
   border: none;
   font-size: 1rem;
-
   transition: background 0.2s;
 
   &:hover {
@@ -44,3 +42,23 @@
   color: white;
 }
 
+// On small screens, collapse labels and show only icons
+@media (max-width: 768px) {
+  .sidebar {
+    width: 60px;
+    padding: 0.5rem;
+  }
+
+  .sidebarBtn {
+    justify-content: center;
+    padding: 8px;
+
+    .icon {
+      margin: 0;
+    }
+
+    .label {
+      display: none;
+    }
+  }
+}

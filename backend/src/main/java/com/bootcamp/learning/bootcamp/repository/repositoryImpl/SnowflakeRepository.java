@@ -191,11 +191,11 @@ public class SnowflakeRepository implements BaseRepository<CostExplorerEntity> {
             }
         }
 
-        // 2) build SQL
+        // 2) build SQL coalesce NULL→'Unknown'
+        String grpExpr = "COALESCE(" + groupByColumn + ",'Unknown')";
         StringBuilder sql = new StringBuilder()
                 .append("SELECT ")
-                .append(groupByColumn)
-                .append(" AS grp, ")
+                .append(grpExpr).append(" AS grp, ")
                 .append("MYCLOUD_STARTYEAR, MYCLOUD_STARTMONTH, ")
                 .append("SUM(LINEITEM_USAGEAMOUNT * LINEITEM_UNBLENDEDCOST) as Total_Cost ")
                 .append("FROM cost_explorer ")
@@ -216,7 +216,7 @@ public class SnowflakeRepository implements BaseRepository<CostExplorerEntity> {
         }
 
         sql.append("GROUP BY ")
-                .append(groupByColumn)
+                .append(grpExpr)
                 .append(", MYCLOUD_STARTYEAR, MYCLOUD_STARTMONTH ")
                 .append("ORDER BY MYCLOUD_STARTYEAR, MYCLOUD_STARTMONTH");
 

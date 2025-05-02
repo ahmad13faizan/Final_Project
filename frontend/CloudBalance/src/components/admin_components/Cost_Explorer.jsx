@@ -26,14 +26,15 @@ const Cost_Explorer = () => {
   const dispatch = useDispatch();
   const { columns, loading } = useSelector((state) => state.costExplorer);
 
-  const [selectedGroup, setSelectedGroup] = useState("");
+  const [selectedGroup, setSelectedGroup] = useState("PRODUCT_PRODUCTNAME");
   const [checkedValues, setCheckedValues] = useState({});   // { col: [vals] }
   const [columnValues, setColumnValues] = useState({});     // { col: [all vals] }
   const [openValues, setOpenValues] = useState({});         // { col: bool }
   const [showFilters, setShowFilters] = useState(false);
   const [data, setData] = useState([]);
 
-  const [startDate, setStartDate] = useState(dayjs().startOf("month"));
+  const [startDate, setStartDate] = useState(dayjs('2025-04-01'));
+
   const [endDate, setEndDate] = useState(dayjs());
 
   const [anchorEl, setAnchorEl] = useState(null);
@@ -187,10 +188,13 @@ const Cost_Explorer = () => {
 
       {/* Charts + Filters */}
       <Box sx={{ display:"flex", gap:2, bgcolor:"#fff", p:2, borderRadius:2 }}>
-        <Box sx={{ flexGrow:1 }}>{/* chart area */}</Box>
+        <Box sx={{ flexGrow:1 }}> charts boxes area </Box>
+
+
+
         {showFilters && (
           <Paper variant="outlined" sx={{ p:2, maxWidth:300, maxHeight:400, overflowY:"auto" }}>
-            <Typography variant="h6" gutterBottom>Filters</Typography>
+            <Typography sx={{background:"white", position:"sticky",top:"0"}} variant="h6" gutterBottom>Filters</Typography>
             {columns.map(col => (
               <Box key={col} mb={1}>
                 <Box display="flex" alignItems="center">
