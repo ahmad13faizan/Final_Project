@@ -1,21 +1,30 @@
 import React from "react";
 import styles from "../../styles/Onboarding2.module.scss"; // Adjust the path as necessary
-import  img1 from "../../assets/images/onboarding2pics/ck_tuner_role1.png";
-import  img2 from "../../assets/images/onboarding2pics/Permisssion_policies2.png"
-import  img3 from "../../assets/images/onboarding2pics/onboarding_steps_customer_managed3.png";
-import  img4 from "../../assets/images/onboarding2pics/add_permissions4.png";
-import {IconButton, Tooltip, Snackbar ,Box,Button,Stack} from "@mui/material";
+import img1 from "../../assets/images/onboarding2pics/ck_tuner_role1.png";
+import img2 from "../../assets/images/onboarding2pics/Permisssion_policies2.png";
+import img3 from "../../assets/images/onboarding2pics/onboarding_steps_customer_managed3.png";
+import img4 from "../../assets/images/onboarding2pics/add_permissions4.png";
+import {
+  IconButton,
+  Tooltip,
+  Snackbar,
+  Box,
+  Button,
+  Stack,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { data1,data2,data3,data4 } from "../admin_components/Onboarding2data"; // Adjust the path as necessary
+import {
+  data1,
+  data2,
+  data3,
+  data4,
+} from "../admin_components/Onboarding2data"; // Adjust the path as necessary
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { useState } from "react";
 
-
 const Onboarding2 = () => {
-
   const [copied, setCopied] = useState(false);
   const navigate = useNavigate();
-
 
   const handleCopy = async (data) => {
     try {
@@ -37,7 +46,6 @@ const Onboarding2 = () => {
         Create an Inline policy for the role by following these steps
       </p>
 
-
       <div className={styles.section}>
         <p className={styles.stepText}>
           <span className={styles.bullet}> 1 </span> Go to the{" "}
@@ -51,17 +59,15 @@ const Onboarding2 = () => {
           and paste the following policy and click on Next:
         </p>
         <pre className={styles.codeBlock}>
-
-        <div style={{ position: "relative" }}>
+          <div style={{ position: "relative" }}>
             <div style={{ position: "absolute", top: 0, right: 0 }}>
               <Tooltip title="Copy to Clipboard">
-                <IconButton onClick={()=> handleCopy(data1)} color="primary">
+                <IconButton onClick={() => handleCopy(data1)} color="primary">
                   <ContentCopyIcon />
                 </IconButton>
               </Tooltip>
             </div>
           </div>
-
 
           <Snackbar
             open={copied}
@@ -78,24 +84,22 @@ const Onboarding2 = () => {
             }}
           />
 
-
-
           {data1}
-          
         </pre>
         <p className={styles.stepText}>
           <span className={styles.bullet}> 3 </span>In the <b>Name</b> field,
           enter below-mentioned policy name and click on Create Policy
         </p>
-        <div className={styles.inputBox}>cktuner-CostAuditPolicy
-       
+        <div className={styles.inputBox}>
+          cktuner-CostAuditPolicy
           <Tooltip title="Copy to Clipboard">
-            <IconButton onClick={()=> handleCopy("cktuner-CostAuditPolicy")} color="primary">
-            <ContentCopyIcon />
+            <IconButton
+              onClick={() => handleCopy("cktuner-CostAuditPolicy")}
+              color="primary"
+            >
+              <ContentCopyIcon />
             </IconButton>
           </Tooltip>
-
-
           <Snackbar
             open={copied}
             autoHideDuration={2000}
@@ -125,16 +129,15 @@ const Onboarding2 = () => {
           and paste the following policy and click on Next:
         </p>
         <pre className={styles.codeBlock}>
-        <div style={{ position: "relative" }}>
+          <div style={{ position: "relative" }}>
             <div style={{ position: "absolute", top: 0, right: 0 }}>
               <Tooltip title="Copy to Clipboard">
-                <IconButton onClick={()=> handleCopy(data2)} color="primary">
+                <IconButton onClick={() => handleCopy(data2)} color="primary">
                   <ContentCopyIcon />
                 </IconButton>
               </Tooltip>
             </div>
           </div>
-
 
           <Snackbar
             open={copied}
@@ -156,15 +159,16 @@ const Onboarding2 = () => {
           <span className={styles.bullet}> 6 </span>In the <b>Name</b> field,
           enter below-mentioned policy name and click on Create Policy
         </p>
-        <div className={styles.inputBox}>cktuner-SecAuditPolicy
-        
-        <Tooltip title="Copy to Clipboard">
-            <IconButton onClick={()=> handleCopy("cktuner-SecAuditPolicy")} color="primary">
-            <ContentCopyIcon />
+        <div className={styles.inputBox}>
+          cktuner-SecAuditPolicy
+          <Tooltip title="Copy to Clipboard">
+            <IconButton
+              onClick={() => handleCopy("cktuner-SecAuditPolicy")}
+              color="primary"
+            >
+              <ContentCopyIcon />
             </IconButton>
           </Tooltip>
-
-
           <Snackbar
             open={copied}
             autoHideDuration={2000}
@@ -179,7 +183,6 @@ const Onboarding2 = () => {
               zIndex: 1300, // Keep above content
             }}
           />
-          
         </div>
         <p className={styles.stepText}>
           <span className={styles.bullet}> 7 </span>Again, go to the{" "}
@@ -194,16 +197,15 @@ const Onboarding2 = () => {
           and paste the following policy and click on Next:
         </p>
         <pre className={styles.codeBlock}>
-        <div style={{ position: "relative" }}>
+          <div style={{ position: "relative" }}>
             <div style={{ position: "absolute", top: 0, right: 0 }}>
               <Tooltip title="Copy to Clipboard">
-                <IconButton onClick={()=> handleCopy(data3)} color="primary">
+                <IconButton onClick={() => handleCopy(data3)} color="primary">
                   <ContentCopyIcon />
                 </IconButton>
               </Tooltip>
             </div>
           </div>
-
 
           <Snackbar
             open={copied}
@@ -225,15 +227,16 @@ const Onboarding2 = () => {
           <span className={styles.bullet}> 9 </span>In the <b>Name</b> field,
           enter below-mentioned policy name and click on Create Policy
         </p>
-        <div className={styles.inputBox}>cktuner-TunerReadEssentials
-
-        <Tooltip title="Copy to Clipboard">
-            <IconButton onClick={()=> handleCopy("cktuner-TunerReadEssentials")} color="primary">
-            <ContentCopyIcon />
+        <div className={styles.inputBox}>
+          cktuner-TunerReadEssentials
+          <Tooltip title="Copy to Clipboard">
+            <IconButton
+              onClick={() => handleCopy("cktuner-TunerReadEssentials")}
+              color="primary"
+            >
+              <ContentCopyIcon />
             </IconButton>
           </Tooltip>
-
-
           <Snackbar
             open={copied}
             autoHideDuration={2000}
@@ -255,10 +258,9 @@ const Onboarding2 = () => {
           <a href="#" className={styles.link}>
             CK-Tuner-Role
           </a>{" "}
-          
         </p>
 
-              <Box
+        <Box
           component="img"
           src={img1}
           alt="IAM Role Screenshot"
@@ -268,8 +270,7 @@ const Onboarding2 = () => {
             borderRadius: 1,
             boxShadow: 1,
           }}
-          />
-
+        />
 
         <p className={styles.stepText}>
           <span className={styles.bullet}> 11 </span>In Permission policies,
@@ -286,7 +287,7 @@ const Onboarding2 = () => {
             borderRadius: 1,
             boxShadow: 1,
           }}
-          />
+        />
 
         <p className={styles.stepText}>
           <span className={styles.bullet}> 12 </span>Filter by Type {">"}{" "}
@@ -309,7 +310,7 @@ const Onboarding2 = () => {
             borderRadius: 1,
             boxShadow: 1,
           }}
-          />
+        />
 
         <p className={styles.stepText}>
           <span className={styles.bullet}> 13 </span>Now, Click on{" "}
@@ -331,23 +332,22 @@ const Onboarding2 = () => {
             borderRadius: 1,
             boxShadow: 1,
           }}
-          />
+        />
         <p className={styles.stepText}>
           <span className={styles.bullet}> 15 </span>Click on the <b>JSON</b>{" "}
           tab, paste the following policy
         </p>
 
         <pre className={styles.codeBlock}>
-        <div style={{ position: "relative" }}>
+          <div style={{ position: "relative" }}>
             <div style={{ position: "absolute", top: 0, right: 0 }}>
               <Tooltip title="Copy to Clipboard">
-                <IconButton onClick={()=> handleCopy(data1)} color="primary">
+                <IconButton onClick={() => handleCopy(data1)} color="primary">
                   <ContentCopyIcon />
                 </IconButton>
               </Tooltip>
             </div>
           </div>
-
 
           <Snackbar
             open={copied}
@@ -376,14 +376,16 @@ const Onboarding2 = () => {
           enter below-mentioned policy name and click on Create Policy
         </p>
 
-        <div className={styles.inputBox}>S3CrossAccountReplication
-        <Tooltip title="Copy to Clipboard">
-            <IconButton onClick={()=> handleCopy("S3CrossAccountReplication")} color="primary">
-            <ContentCopyIcon />
+        <div className={styles.inputBox}>
+          S3CrossAccountReplication
+          <Tooltip title="Copy to Clipboard">
+            <IconButton
+              onClick={() => handleCopy("S3CrossAccountReplication")}
+              color="primary"
+            >
+              <ContentCopyIcon />
             </IconButton>
           </Tooltip>
-
-
           <Snackbar
             open={copied}
             autoHideDuration={2000}
@@ -401,40 +403,52 @@ const Onboarding2 = () => {
         </div>
       </div>
       <Box
-      display="flex"
-      justifyContent="space-between"
-      alignItems="center"
-      width="100%"
-      sx={{ mt: -12 }} // Lifts it slightly above
-    >
-      {/* Left: Cancel */}
-      <Button
-        variant="outlined"
-        sx={{ backgroundColor:"#d32f2f", borderColor:"none", color: "#fff !important" }}
-        onClick={() => navigate("/admin")}
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        width="100%"
+        sx={{ mt: -12 }} // Lifts it slightly above
       >
-        Cancel
-      </Button>
-
-      {/* Right: Back & Continue */}
-      <Stack direction="row" spacing={2}>
+        {/* Left: Cancel */}
         <Button
           variant="outlined"
-          sx={{ backgroundColor:"white", borderColor: "blue", color: "#003aa8 !important" }}
-          onClick={() => navigate("/admin/onboarding")}
+          sx={{
+            backgroundColor: "#d32f2f",
+            borderColor: "none",
+            color: "#fff !important",
+          }}
+          onClick={() => navigate("/home")}
         >
-          Back - Create IAM Role
+          Cancel
         </Button>
 
-        <Button
-          variant="outlined"
-          sx={{ borderColor: "blue",backgroundColor:"white", color: "#003aa8 !important" }}
-          onClick={() => navigate("/admin/onboarding3")}
-        >
-          Continue
-        </Button>
-      </Stack>
-    </Box>
+        {/* Right: Back & Continue */}
+        <Stack direction="row" spacing={2}>
+          <Button
+            variant="outlined"
+            sx={{
+              backgroundColor: "white",
+              borderColor: "blue",
+              color: "#003aa8 !important",
+            }}
+            onClick={() => navigate("/home/onboarding")}
+          >
+            Back - Create IAM Role
+          </Button>
+
+          <Button
+            variant="outlined"
+            sx={{
+              borderColor: "blue",
+              backgroundColor: "white",
+              color: "#003aa8 !important",
+            }}
+            onClick={() => navigate("/home/onboarding3")}
+          >
+            Continue
+          </Button>
+        </Stack>
+      </Box>
     </div>
   );
 };

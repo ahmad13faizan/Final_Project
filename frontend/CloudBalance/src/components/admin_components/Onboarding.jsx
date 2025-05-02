@@ -123,7 +123,7 @@ const Onboarding = () => {
             <Typography>
               Log into AWS account &nbsp;
               <a
-                href="https://console.aws.amazon.com/iamv2/home#/roles"
+                href="https://console.aws.amazon.com/iamv2/admin#/roles"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -260,7 +260,7 @@ const Onboarding = () => {
           {formConfig.length > 2 && (
             <Box mt={2} display="flex" gap={2}>
               <Divider sx={{ my: 3 }} />
-              <Box mt={2} width={"48%"}>
+              <Box mt={2} width={"50%"}>
                 <Typography variant="body1" gutterBottom>
                   <strong>{formConfig[2].label}</strong>
                 </Typography>
@@ -276,7 +276,7 @@ const Onboarding = () => {
                 />
               </Box>
               {formConfig.length > 3 && (
-                <Box mt={2} width={"48%"}>
+                <Box mt={2} width={"50%"}>
                   <Typography variant="body1" gutterBottom>
                     <strong>{formConfig[3].label}</strong>
                   </Typography>
@@ -321,7 +321,7 @@ const Onboarding = () => {
             <Button
               variant="contained"
               color="error"
-              onClick={() => navigate("/admin")}
+              onClick={() => navigate("/home")}
             >
               Cancel
             </Button>
@@ -329,7 +329,7 @@ const Onboarding = () => {
           <Button
             variant="contained"
             endIcon={<ArrowForward />}
-            onClick={() => navigate("/admin/onboarding2")}
+            onClick={() => navigate("/home/onboarding2")}
             disabled={!roleArn || error}
             sx={{
               backgroundColor: !roleArn || error ? "grey" : "primary.main",

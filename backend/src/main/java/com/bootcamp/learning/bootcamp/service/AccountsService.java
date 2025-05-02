@@ -1,5 +1,6 @@
 package com.bootcamp.learning.bootcamp.service;
 
+import com.bootcamp.learning.bootcamp.dto.AccountSummaryDTO;
 import com.bootcamp.learning.bootcamp.entity.Accounts;
 import org.springframework.security.core.Authentication;
 
@@ -12,6 +13,6 @@ public interface AccountsService{
     Accounts createResource(Accounts resource);
     Accounts updateResource(Long id, Accounts resource);
     void deleteResource(Long id);
-    List<Accounts> getAccounts(Authentication authentication);
+    List<AccountSummaryDTO> getAccounts(Authentication authentication);
 
 }

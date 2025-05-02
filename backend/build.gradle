@@ -27,6 +27,9 @@ dependencies {
 	implementation 'software.amazon.awssdk:rds'
 	implementation 'software.amazon.awssdk:autoscaling'
 
+	//for snowflake-jdbc
+	implementation("net.snowflake:snowflake-jdbc:3.23.0")
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 
 	// ✅ .env support
 	implementation 'io.github.cdimascio:dotenv-java:3.0.0'

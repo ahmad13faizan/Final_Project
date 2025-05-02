@@ -1,13 +1,29 @@
 import React, { useEffect, useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  CircularProgress,
+  Typography,
+  IconButton,
+  Box,
+  Stack,
+} from "@mui/material";
+import { Edit as EditIcon, Add as AddIcon } from "@mui/icons-material";
 import api from "../api/axios";
-import "../styles/UserDashboard.scss";
-import { Pencil } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const UserTable = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  
+  const role = localStorage.getItem("role"); // 🧠 get role
 
   const fetchUsers = async () => {
     try {
@@ -26,68 +42,146 @@ const UserTable = () => {
   }, []);
 
   const handleAddUser = () => {
-    navigate("/admin/register");
+    navigate("/home/register");
   };
 
   const handleEdit = (user) => {
-    navigate("/admin/register", { state: { editUser: user } });
+    navigate("/home/register", { state: { editUser: user } });
   };
 
   return (
-    <div className="user-dashboard-container">
-      <div className="dashboard-header">
-        <h2>Users</h2>
-        <div className="actions">
-          <button onClick={handleAddUser} className="btn-add-user">
-            + Add User
-          </button>
-        </div>
-      </div>
-
-      <div className="table-container">
-        {loading ? (
-          <p>Loading...</p>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>User ID</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Last Login</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.length > 0 ? (
-                users.map((user, index) => (
-                  <tr key={user.id}>
-                    <td>{index + 1}</td>
-                    <td>{user.id}</td>
-                    <td>{user.username || "N/A"}</td>
-                    <td>{user.email}</td>
-                    <td>{user.role}</td>
-                    <td>{user.lastLogin ? new Date(user.lastLogin).toLocaleString() : "No login yet"}</td>
-                    <td className="cursor-pointer">
-                      <button onClick={() => handleEdit(user)}>
-                      <Pencil color="#000" size={18} style={{ padding: '4px', borderRadius: '4px' }} />
-
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="7">No users found.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+    <Box sx={{ p: 4 }}>
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={2}
+      >
+        <Typography variant="h4" fontWeight={600}>
+          Users
+        </Typography>
+        {/* Hide Add button also if role is readonly (Optional) */}
+        {role !== "ROLE_READ_ONLY" && (
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<AddIcon />}
+            onClick={handleAddUser}
+          >
+            Add User
+          </Button>
         )}
-      </div>
-    </div>
+      </Stack>
+
+      <Paper elevation={3} sx={{ borderRadius: 2 }}>
+        <TableContainer sx={{ borderRadius: 2, maxHeight: 800 }}>
+          {loading ? (
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              height={200}
+            >
+              <CircularProgress />
+            </Box>
+          ) : (
+            <Table stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <TableCell
+                    sx={{
+                      backgroundColor: "#1976b2",
+                      color: "white",
+                      fontWeight: "bolder",
+                    }}
+                  >
+                    Username
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      backgroundColor: "#1976b2",
+                      color: "white",
+                      fontWeight: "bolder",
+                    }}
+                  >
+                    Email
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      backgroundColor: "#1976b2",
+                      color: "white",
+                      fontWeight: "bolder",
+                    }}
+                  >
+                    Role
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      backgroundColor: "#1976b2",
+                      color: "white",
+                      fontWeight: "bolder",
+                    }}
+                  >
+                    Last Login
+                  </TableCell>
+
+                  {/* Show Actions column only if not readonly */}
+                  {role !== "ROLE_READ_ONLY" && (
+                    <TableCell
+                      sx={{
+                        backgroundColor: "#1976b2",
+                        color: "white",
+                        fontWeight: "bolder",
+                      }}
+                      align="center"
+                    >
+                      Actions
+                    </TableCell>
+                  )}
+                </TableRow>
+              </TableHead>
+
+              <TableBody>
+                {users.length > 0 ? (
+                  users.map((user) => (
+                    <TableRow key={user.id} hover>
+                      <TableCell>{user.username || "N/A"}</TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell>{user.role}</TableCell>
+                      <TableCell>
+                        {user.lastLogin
+                          ? new Date(user.lastLogin).toLocaleString()
+                          : "No login yet"}
+                      </TableCell>
+
+                      {/* Show edit button only if not readonly */}
+                      {role !== "ROLE_READ_ONLY" && (
+                        <TableCell align="center">
+                          <IconButton
+                            onClick={() => handleEdit(user)}
+                            color="primary"
+                            size="small"
+                            sx={{ bgcolor: "#e3f2fd", borderRadius: 1 }}
+                          >
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={role !== "ROLE_READ_ONLY" ? 5 : 4} align="center">
+                      No users found.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          )}
+        </TableContainer>
+      </Paper>
+    </Box>
   );
 };
 

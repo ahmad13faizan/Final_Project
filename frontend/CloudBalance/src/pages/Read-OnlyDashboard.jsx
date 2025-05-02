@@ -1,7 +1,7 @@
 // src/pages/CustomerDashboard.jsx
 import React from 'react';
 
-const CustomerDashboard = () => {
+const ReadOnlyDashboard = () => {
   return (
     <div style={styles.container}>
       <h1> Read-Only Dashboard</h1>
@@ -17,4 +17,4 @@ const styles = {
   },
 };
 
-export default CustomerDashboard;
+export default ReadOnlyDashboard;

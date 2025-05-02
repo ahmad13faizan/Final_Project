@@ -1,5 +1,6 @@
 package com.bootcamp.learning.bootcamp.controller;
 
+import com.bootcamp.learning.bootcamp.dto.AccountSummaryDTO;
 import com.bootcamp.learning.bootcamp.dto.AccountsDTO;
 import com.bootcamp.learning.bootcamp.entity.Accounts;
 import com.bootcamp.learning.bootcamp.service.AccountsService;
@@ -9,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -21,7 +21,7 @@ public class AccountsController {
     private AccountsService service;
 
     @GetMapping
-    public ResponseEntity<List<Accounts>> getAccounts(Authentication authentication) {
+    public ResponseEntity<List<AccountSummaryDTO>> getAccounts(Authentication authentication) {
         return ResponseEntity.ok(service.getAccounts(authentication));
     }
 
