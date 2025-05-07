@@ -1,27 +1,37 @@
 // components/AppRoutes.jsx
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Login from "../components/Login";
 import Register from "../components/Register";
 import MainDashboard from "../pages/MainDashboard";
-import CustomerDashboard from "../pages/CustomerDashboard";
-import ReadOnlyDashboard from "../pages/Read-OnlyDashboard";
+import CustomerDashboard from "../pages/customer/CustomerDashboard";
 import ProtectedRoute from "../components/ProtectedRoutes";
 import Unauthorized from "../error/Unauthorized";
 import Not_Found from "../error/Not_Found";
 import UserTable from "../pages/UserTable";
 import Footer from "../components/footer/Footer";
-import Onboarding from "../components/admin_components/Onboarding";
-import Onboarding2 from "../components/admin_components/Onboarding2";
-import Onboarding3 from "../components/admin_components/Onboarding3";
-import ThankYouPage from "./admin_components/ThankYouPage";
+import Onboarding from "../pages/admin/Onboarding";
+import Onboarding2 from "../pages/admin/Onboarding2";
+import Onboarding3 from "../pages/admin/Onboarding3";
+import ThankYouPage from "../pages/admin/ThankYouPage";
 import "../styles/common.scss";
-import AWSDashboard from "../components/admin_components/AWSDashboard";
-import Cost_Explorer from "./admin_components/Cost_Explorer";
+import AWSDashboard from "../pages/AWSDashboard";
+import Cost_Explorer from "../pages/Cost_Explorer";
 
 const AppRoutes = () => {
   const location = useLocation();
-  const userLoggedIn = localStorage.getItem("token") !== null;
+
+  const token = localStorage.getItem("token");
+  const role  = localStorage.getItem("role");
+  const userLoggedIn = token !== null;
+
+  // decide landing path based on role
+  const defaultPath =
+    role === "ROLE_ADMIN"     ? "/home" :
+    role === "ROLE_CUSTOMER"  ? "/customer" :
+    role === "ROLE_READ_ONLY" ? "/readonly" :
+                                 "/login";
+
   const showNavbar =
     userLoggedIn &&
     /^\/(home|customer|readonly|register)/.test(location.pathname);
@@ -31,10 +41,23 @@ const AppRoutes = () => {
       {showNavbar && <Navbar />}
 
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/" element={<Login />} />
-
-        
+        {/* if already logged in, redirect away from login */}
+        <Route
+          path="/login"
+          element={
+            userLoggedIn
+              ? <Navigate to={defaultPath} replace state={{ from: location }} />
+              : <Login />
+          }
+        />
+        <Route
+          path="/"
+          element={
+            userLoggedIn
+              ? <Navigate to={defaultPath} replace state={{ from: location }} />
+              : <Navigate to="/login" replace />
+          }
+        />
 
         {/* Admin */}
         <Route element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]} />}>
@@ -54,22 +77,19 @@ const AppRoutes = () => {
         {/* Customer */}
         <Route element={<ProtectedRoute allowedRoles={["ROLE_CUSTOMER"]} />}>
           <Route path="/customer" element={<MainDashboard />}>
-          <Route index element={<CustomerDashboard />} />
-          <Route path="aws" element={<AWSDashboard />} />
-          <Route path="cost" element={<Cost_Explorer />} />
-          
+            <Route index element={<CustomerDashboard />} />
+            <Route path="aws" element={<AWSDashboard />} />
+            <Route path="cost" element={<Cost_Explorer />} />
           </Route>
         </Route>
 
         {/* Read Only */}
         <Route element={<ProtectedRoute allowedRoles={["ROLE_READ_ONLY"]} />}>
-          <Route path="/readonly" element={<MainDashboard />} >
-            <Route index  element={<UserTable />} />
+          <Route path="/readonly" element={<MainDashboard />}>
+            <Route index element={<UserTable />} />
             <Route path="aws" element={<AWSDashboard />} />
             <Route path="cost" element={<Cost_Explorer />} />
-            
           </Route>
-
         </Route>
 
         <Route path="/error" element={<Unauthorized />} />

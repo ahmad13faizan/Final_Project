@@ -23,7 +23,7 @@ import {
 } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { FaLock, FaCloud } from "react-icons/fa";
-import api from "../../api/axios";
+import api from "../api/axios";
 
 const getAccountIcon = (name) => {
   const key = name.toLowerCase();
@@ -54,9 +54,12 @@ const AWSDashboard = ({ onAccountChange, selectedAccountId = "" }) => {
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
+        
         const response = await api.get("/api/accounts");
         setAccounts(response.data);
-        setSelectedAccount(response.data[5].accountId)
+        setSelectedAccount(response.data[5].accountId);
+        fetchResources(response.data[5].accountId, "ec2");
+
       } catch (error) {
         console.error("Failed to fetch accounts", error);
       } finally {
@@ -231,7 +234,7 @@ const AWSDashboard = ({ onAccountChange, selectedAccountId = "" }) => {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={Object.keys(filters).length}>
-                      No resources match your filter.
+                      No resource found.
                     </TableCell>
                   </TableRow>
                 )}

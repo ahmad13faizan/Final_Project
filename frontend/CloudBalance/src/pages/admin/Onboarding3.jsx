@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { Stack } from "@mui/material";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch  } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import api from "../../api/axios";
 import img1 from "../../assets/images/onboarding3pics/img1.png";
 import img2 from "../../assets/images/onboarding3pics/img2.png";
 import img3 from "../../assets/images/onboarding3pics/img3.png";
 import img4 from "../../assets/images/onboarding3pics/img4.png";
-import api from "../../api/axios";
-
 import {
   CircularProgress,
   Container,
@@ -29,16 +28,22 @@ import {
   ArrowForward as ArrowForwardIcon,
   ContentCopy as ContentCopyIcon,
 } from "@mui/icons-material";
+import { clearAccountData } from "../../redux/onboardingSlice"; 
 
 const Onboarding3 = () => {
-  const roleArn = useSelector((state) => state.onboarding.roleArn);
-  const accountName = useSelector((state) => state.onboarding.accountName);
+
+  const dispatch=useDispatch();
+  const [includeResourceIds, setIncludeResourceIds] = useState(true);
 
   const navigate = useNavigate();
   // Assuming accountId was stored earlier in Redux
   const accountId =
-    useSelector((state) => state.onboarding.accountId) || "{951485052809}";
-  const region = useSelector((state) => state.onboarding.region) || "us-east-1";
+    useSelector((state) => state.onboarding.accountId) || "{Your-account-ID}";
+
+  const roleArn = useSelector((s) => s.onboarding.roleArn);
+  const accountName = useSelector((s) => s.onboarding.accountName);
+  const region = useSelector((s) => s.onboarding.region);
+
   // Generate report name
   const defaultReportName = `ck-tuner-${accountId}-hourly-cur`;
 
@@ -65,17 +70,18 @@ const Onboarding3 = () => {
   });
 
   const handleSubmit = async () => {
-    const payload = {
-      accountId: Number(accountId),
-      arn: roleArn,
-      accountName,
-      region,
-    };
-
     setLoading(true);
 
+    // build the AccountsDTO payload
+    const payload = {
+      accountId: Number(accountId), // must be Long
+      arn: roleArn, // your roleArn from redux
+      accountName: accountName, // from redux
+      region: region, // from redux
+    };
+
     try {
-      const response = await api.post("/api/accounts", payload);
+      await api.post("/api/accounts", payload);
 
       setSnackbar({
         open: true,
@@ -83,11 +89,12 @@ const Onboarding3 = () => {
         severity: "success",
       });
 
-      // Navigate to thank you page after short delay (or immediately)
-      setTimeout(() => {
-        navigate("/home/thank-you");
-      }, 1000); // 1-second delay to show snackbar (optional)
+      dispatch(clearAccountData());
+
+      // after a short pause navigate on
+      setTimeout(() => navigate("/home/thank-you"), 800);
     } catch (error) {
+      console.log(error)
       setSnackbar({
         open: true,
         message: error.response?.data?.message || "Something went wrong.",
@@ -156,7 +163,13 @@ const Onboarding3 = () => {
             </Box>
 
             <FormControlLabel
-              control={<Checkbox checked={"includeResourceIds"} />}
+              control={
+                <Checkbox
+                  checked={includeResourceIds}
+                  onChange={(e) => setIncludeResourceIds(e.target.checked)}
+                  color="primary"
+                />
+              }
               label="Include Resource IDs"
               sx={{ mt: 1 }}
             />
@@ -179,7 +192,7 @@ const Onboarding3 = () => {
               In <strong>Configure S3 Bucket</strong>, provide the name of the
               S3 bucket that was created:
               <FormControlLabel
-                control={<Checkbox checked={"includeResourceIds"} />}
+                control={<Checkbox checked={includeResourceIds} />}
                 label="The following default policy will be applied to your bucket"
                 sx={{ mt: 1 }}
               />

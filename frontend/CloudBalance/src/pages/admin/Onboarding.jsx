@@ -46,6 +46,8 @@ const Onboarding = () => {
   const error1 = false; // Replace with actual error state if validation is needed
 
   const [errorRoleArn, setErrorRoleArn] = useState(false);
+  const [errorAccountId, setErrorAccountId] = useState(false);
+  
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -55,6 +57,8 @@ const Onboarding = () => {
       setErrorRoleArn(!isValid); // true if invalid
       dispatch(setRoleArn(value));
     } else if (name === "accountId") {
+      const isValid = /^\d{12}$/.test(value); // accountId must be 12 digits
+      setErrorAccountId(!isValid);
       dispatch(setAccountId(value));
     } else if (name === "accountName") {
       dispatch(setAccountName(value));
@@ -67,7 +71,8 @@ const Onboarding = () => {
     "Current IAM Role ARN in Redux:",
     roleArn,
     accountId,
-    accountName
+    accountName,
+    region
   );
 
   const [error, setError] = useState(false);
@@ -238,6 +243,7 @@ const Onboarding = () => {
                 <TextField
                   fullWidth
                   placeholder={field.placeholder}
+                  type={field.fieldName === "accountId" ? "number" : "text"} // restrict to number
                   value={
                     field.fieldName === "roleArn"
                       ? roleArn
@@ -247,8 +253,16 @@ const Onboarding = () => {
                   }
                   onChange={handleChange}
                   name={field.fieldName}
-                  error={errorRoleArn}
-                  helperText={errorRoleArn ? field.helperText : ""}
+                  error={
+                    field.fieldName === "roleArn"
+                      ? errorRoleArn
+                      : errorAccountId
+                  }
+                  helperText={
+                    field.fieldName === "roleArn"
+                      ? errorRoleArn && field.helperText
+                      : errorAccountId && field.helperText
+                  }
                   sx={{ mt: 1 }}
                 />
               </Box>
@@ -281,19 +295,16 @@ const Onboarding = () => {
                     <strong>{formConfig[3].label}</strong>
                   </Typography>
 
-                  <FormControl fullWidth>
-                    <InputLabel id="random">
+                  <FormControl fullWidth error={error1}>
+                    <InputLabel id="region-label">
                       {formConfig[3].placeholder}
                     </InputLabel>
                     <Select
-                      fullWidth
-                      select
+                      labelId="region-label"
                       label={formConfig[3].placeholder}
-                      value={region}
+                      value={region ?? ""}
                       onChange={handleChange}
                       name={formConfig[3].fieldName}
-                      error={error1}
-                      helperText={error1 ? formConfig[3].helperText : ""}
                       sx={{ mt: 1 }}
                     >
                       {formConfig[3].options.map((option) => (
@@ -302,6 +313,11 @@ const Onboarding = () => {
                         </MenuItem>
                       ))}
                     </Select>
+                    {error1 && (
+                      <FormHelperText>
+                        {formConfig[3].helperText}
+                      </FormHelperText>
+                    )}
                   </FormControl>
                 </Box>
               )}

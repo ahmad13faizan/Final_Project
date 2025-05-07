@@ -18,7 +18,7 @@ import {
   data2,
   data3,
   data4,
-} from "../admin_components/Onboarding2data"; // Adjust the path as necessary
+} from "../admin/Onboarding2data"; // Adjust the path as necessary
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { useState } from "react";
 

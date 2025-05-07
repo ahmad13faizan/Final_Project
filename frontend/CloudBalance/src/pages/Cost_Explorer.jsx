@@ -24,9 +24,14 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { FaSlidersH } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchColumns } from "../../redux/costExplorerSlice";
-import formatColumn from "../../utils/Formatter";
-import api from "../../api/axios";
+import { fetchColumns } from "../redux/costExplorerSlice";
+import formatColumn from "../utils/Formatter";
+import api from "../api/axios";
+import FusionCharts from "fusioncharts";
+import Charts from "fusioncharts/fusioncharts.charts";
+import ReactFC from "react-fusioncharts";
+
+ReactFC.fcRoot(FusionCharts, Charts);
 
 const Cost_Explorer = () => {
   const dispatch = useDispatch();
@@ -127,6 +132,61 @@ const Cost_Explorer = () => {
   // helper to sum all month values for a row:
   const sumRow = (row) =>
     monthKeys.reduce((acc, m) => acc + (row.monthToCost[m] || 0), 0);
+
+  // 1) figure out the top‑5 groups by TOTAL cost across all months:
+  //
+  const totals = data.map((r) => ({
+    group: r.groupValue,
+    total: monthKeys.reduce((sum, m) => sum + (r.monthToCost[m] || 0), 0),
+  }));
+  const top5 = totals
+    .sort((a, b) => b.total - a.total)
+    .slice(0, 5)
+    .map((r) => r.group);
+
+  const lineDataSource = {
+    chart: {
+      caption: "Top 5 Groups Cost Trend",
+      xAxisName: "Month",
+      yAxisName: "Cost",
+      theme: "fusion",
+    },
+    categories: [
+      {
+        category: monthKeys.map((m) => ({ label: m })),
+      },
+    ],
+    dataset: data
+      .filter((r) => top5.includes(r.groupValue))
+      .map((r) => ({
+        seriesname: r.groupValue,
+        data: monthKeys.map((m) => ({
+          value: (r.monthToCost[m] || 0).toFixed(2),
+        })),
+      })),
+  };
+
+  const barDataSources = monthKeys.map((m) => {
+    // for this month, sort groups by that month’s cost:
+    const topThisMonth = [...data]
+      .sort((a, b) => (b.monthToCost[m] || 0) - (a.monthToCost[m] || 0))
+      .slice(0, 5);
+    return {
+      month: m,
+      dataSource: {
+        chart: {
+          caption: `Top 5 for ${m}`,
+          xAxisName: "Group",
+          yAxisName: "Cost",
+          theme: "fusion",
+        },
+        data: topThisMonth.map((r) => ({
+          label: r.groupValue,
+          value: (r.monthToCost[m] || 0).toFixed(2),
+        })),
+      },
+    };
+  });
 
   return (
     <Box m={2} bgcolor="#f0f0f0" p={2} borderRadius={2}>
@@ -248,138 +308,35 @@ const Cost_Explorer = () => {
       >
         <Box sx={{ flexGrow: 1, flexDirection: "column" }}>
           {" "}
-          charts and table boxes area
-          <TableContainer
-            elevation={2}
-            component={Paper}
-            sx={{ maxHeight: 400, flex: 1 }}
-          >
-            <Table stickyHeader size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell
-                    sx={{
-                      color: "white",
-                      borderRight: "solid grey 1px",
-                      fontWeight: "bold",
-                      background: "#0056b3",
-                    }}
-                  >
-                    {formatColumn(selectedGroup)}
-                  </TableCell>
-                  {monthKeys.map((m) => (
-                    <TableCell
-                      sx={{
-                        color: "white",
-                        borderRight: "solid grey 1px",
-                        fontWeight: "bold",
-                        background: "#0056b3",
-                      }}
-                      key={m}
-                      align="right"
-                    >
-                      {m}
-                    </TableCell>
-                  ))}
-                  <TableCell
-                    sx={{
-                      color: "white",
-                      background: "#0056b3",
-                      fontWeight: "bold",
-                    }}
-                    align="right"
-                  >
-                    Total Cost
-                  </TableCell>
-                </TableRow>
-              </TableHead>
+          Charts
+          <Box sx={{ margin: "22px 0px" }}>
+            {/* Multi‑series line chart */}
 
-              <TableBody>
-                {data.map((row, i) => {
-                  const total = sumRow(row);
-                  return (
-                    <TableRow key={i}>
-                      <TableCell sx={{ borderRight: "solid grey 1px" }}>
-                        {row.groupValue}
-                      </TableCell>
-                      {monthKeys.map((m) => (
-                        <TableCell
-                          sx={{ borderRight: "solid grey 1px" }}
-                          key={m}
-                          align="right"
-                        >
-                          {(row.monthToCost[m] || 0).toFixed(2)}
-                        </TableCell>
-                      ))}
-                      <TableCell
-                        sx={{ color: "#0056b3", fontWeight: "bold" }}
-                        align="right"
-                      >
-                        {total.toFixed(2)}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
+            <ReactFC
+              type="msline"
+              width="95%"
+              height="400"
+              dataFormat="json"
+              dataSource={lineDataSource}
+            />
 
-                {/* ─────────────── Grand‑Total Row ─────────────── */}
-                <TableRow sx={{ position: "sticky", bottom: "0" }}>
-                  <TableCell
-                    sx={{
-                      color: "#0056b3",
-                      borderRight: "solid grey 1px",
-                      background: "#c5e0fc",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Grand Total
-                  </TableCell>
+            {<b>LineChart</b>}
+          </Box>
+          <Box>
+            {/* Bar charts per month */}
+            {barDataSources.map((b) => (
+              <ReactFC
+                key={b.month}
+                type="column2d"
+                width="95%"
+                height="300"
+                dataFormat="json"
+                dataSource={b.dataSource}
+              />
+            ))}
 
-                  {monthKeys.map((m) => {
-                    const monthSum = data.reduce(
-                      (sum, r) => sum + (r.monthToCost[m] || 0),
-                      0
-                    );
-                    return (
-                      <TableCell
-                        key={m}
-                        align="right"
-                        sx={{
-                          color: "#0056b3",
-                          borderRight: "solid grey 1px",
-                          fontWeight: "bold",
-                          background: "#c5e0fc",
-                        }}
-                      >
-                        {monthSum.toFixed(2)}
-                      </TableCell>
-                    );
-                  })}
-
-                  {/* overall total of all months & all groups */}
-                  <TableCell
-                    align="right"
-                    sx={{
-                      color: "#0056b3",
-                      fontWeight: "bold",
-                      background: "#c5e0fc",
-                    }}
-                  >
-                    {data
-                      .reduce(
-                        (grand, r) =>
-                          grand +
-                          monthKeys.reduce(
-                            (s, m) => s + (r.monthToCost[m] || 0),
-                            0
-                          ),
-                        0
-                      )
-                      .toFixed(2)}
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
+            {<b>BarChart</b>}
+          </Box>
         </Box>
 
         {showFilters && (
@@ -439,18 +396,137 @@ const Cost_Explorer = () => {
       </Box>
 
       {/* Results */}
-      {data.length > 0 && (
-        <Box mt={3}>
-          <Typography variant="h6" gutterBottom>
-            Results
-          </Typography>
-          {data.map((row, i) => (
-            <Paper key={i} variant="outlined" sx={{ p: 1, mb: 1 }}>
-              <pre style={{ margin: 0 }}>{JSON.stringify(row, null, 2)}</pre>
-            </Paper>
-          ))}
-        </Box>
-      )}
+      <TableContainer
+        elevation={2}
+        component={Paper}
+        sx={{ marginBottom: 6, maxHeight: 400, flex: 1 }}
+      >
+        <Table stickyHeader size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell
+                sx={{
+                  color: "white",
+                  borderRight: "solid grey 1px",
+                  fontWeight: "bold",
+                  background: "#0056b3",
+                }}
+              >
+                {formatColumn(selectedGroup)}
+              </TableCell>
+              {monthKeys.map((m) => (
+                <TableCell
+                  sx={{
+                    color: "white",
+                    borderRight: "solid grey 1px",
+                    fontWeight: "bold",
+                    background: "#0056b3",
+                  }}
+                  key={m}
+                  align="right"
+                >
+                  {m}
+                </TableCell>
+              ))}
+              <TableCell
+                sx={{
+                  color: "white",
+                  background: "#0056b3",
+                  fontWeight: "bold",
+                }}
+                align="right"
+              >
+                Total Cost
+              </TableCell>
+            </TableRow>
+          </TableHead>
+
+          <TableBody>
+            {data.map((row, i) => {
+              const total = sumRow(row);
+              return (
+                <TableRow key={i}>
+                  <TableCell sx={{ borderRight: "solid grey 1px" }}>
+                    {row.groupValue}
+                  </TableCell>
+                  {monthKeys.map((m) => (
+                    <TableCell
+                      sx={{ borderRight: "solid grey 1px" }}
+                      key={m}
+                      align="right"
+                    >
+                      {(row.monthToCost[m] || 0).toFixed(2)}
+                    </TableCell>
+                  ))}
+                  <TableCell
+                    sx={{ color: "#0056b3", fontWeight: "bold" }}
+                    align="right"
+                  >
+                    {total.toFixed(2)}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+
+            {/* ─────────────── Grand‑Total Row ─────────────── */}
+            <TableRow sx={{ position: "sticky", bottom: "0" }}>
+              <TableCell
+                sx={{
+                  color: "#0056b3",
+                  borderRight: "solid grey 1px",
+                  background: "#c5e0fc",
+                  fontWeight: "bold",
+                }}
+              >
+                Grand Total
+              </TableCell>
+
+              {monthKeys.map((m) => {
+                const monthSum = data.reduce(
+                  (sum, r) => sum + (r.monthToCost[m] || 0),
+                  0
+                );
+                return (
+                  <TableCell
+                    key={m}
+                    align="right"
+                    sx={{
+                      color: "#0056b3",
+                      borderRight: "solid grey 1px",
+                      fontWeight: "bold",
+                      background: "#c5e0fc",
+                    }}
+                  >
+                    {monthSum.toFixed(2)}
+                  </TableCell>
+                );
+              })}
+
+              {/* overall total of all months & all groups */}
+              <TableCell
+                align="right"
+                sx={{
+                  color: "#0056b3",
+                  fontWeight: "bold",
+                  background: "#c5e0fc",
+                }}
+              >
+                {data
+                  .reduce(
+                    (grand, r) =>
+                      grand +
+                      monthKeys.reduce(
+                        (s, m) => s + (r.monthToCost[m] || 0),
+                        0
+                      ),
+                    0
+                  )
+                  .toFixed(2)}
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TableContainer>
     </Box>
   );
 };

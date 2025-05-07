@@ -1,13 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
-import costExplorerReducer from "./costExplorerSlice";
+
+const initialState = {
+  roleArn: "",
+  accountId: "",
+  accountName: "",
+  region: ""
+};
 
 const onboardingSlice = createSlice({
   name: "onboarding",
-  initialState: {
-    roleArn: "",
-    accountId: "",
-    accountName: ""
-  },
+  initialState,
   reducers: {
     setRoleArn: (state, action) => {
       state.roleArn = action.payload;
@@ -20,10 +22,10 @@ const onboardingSlice = createSlice({
     },
     setRegion: (state, action) => {
       state.region = action.payload;
-    }
-
+    },
+    clearAccountData: () => initialState // reset state to initial
   }
 });
 
-export const {setRegion, setRoleArn, setAccountId, setAccountName } = onboardingSlice.actions;
+export const { setRegion, setRoleArn, setAccountId, setAccountName, clearAccountData } = onboardingSlice.actions;
 export default onboardingSlice.reducer;
